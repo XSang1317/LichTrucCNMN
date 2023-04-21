@@ -54,6 +54,21 @@ namespace LichTruc.Data
 
             modelBuilder.Entity<PickList>().Property(sc => sc.Used).HasDefaultValue(true);
 
+            modelBuilder.Entity<Staff>()
+            .HasOne<Area>(a => a.Area)
+            .WithMany(s => s.Staff)
+            .HasForeignKey(a => a.Id);
+
+            modelBuilder.Entity<Shifts>()
+            .HasOne<Staff>(a => a.Staff)
+            .WithMany(s => s.Shifts)
+            .HasForeignKey(a => a.Id);
+
+            modelBuilder.Entity<Shifts>()
+            .HasOne<Area>(a => a.Area)
+            .WithMany(s => s.Shifts)
+            .HasForeignKey(a => a.Id);
+
         }
     }
 }

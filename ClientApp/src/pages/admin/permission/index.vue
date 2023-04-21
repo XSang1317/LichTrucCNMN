@@ -5,18 +5,15 @@
         <div class="row">
           <div class="col-3">
             <a-table
-              borderless
-              small
-              striped
-              bordered
-              :fields="fields"
+              :columns="columns"
+              :dataSource="fields"
               selectable
-              select-mode="single"
-              responsive
+              rowKey="id"
               :items="items"
-              @row-selected="onRowSelected"
+              v-on:row-selected="onRowSelected"
+              class="table table-striped table-hover table-bordered"
             >
-              <template v-slot:cell(selected)="{ rowSelected }">
+              <template  v-slot:cell(selected)="{ rowSelected }">
                 <div class="text-center">
                   <template v-if="rowSelected">
                     <span aria-hidden="true">&check;</span>
@@ -32,17 +29,11 @@
           </div>
           <div class="col-5">
             <a-table
-              bordered
-              striped
-              small
-              thead-class="text-center"
-              selectable
-              select-mode="single"
-              hover
-              responsive
-              :fields="fieldsPermissionGroups"
-              :items="permission_groups"
-              @row-selected="onPermissionGroupRowSelected"
+              :columns="permissionGroupsColumns"
+              :dataSource="permissionGroups"
+              rowKey="id"
+              v-on:row-selected="onPermissionGroupRowSelected"
+              class="table table-striped table-hover table-bordered"
             >
               <template v-slot:cell(selected)="{ rowSelected }">
                 <div class="text-center">
@@ -60,21 +51,14 @@
           </div>
           <div class="col-4">
             <a-table
-              thead-class="text-center"
-              bordered
-              striped
-              small
-              head-variant="dark"
-              hover
-              responsive
-              :fields="fieldsActivity"
-              :items="permissionsByGroup"
-              table-variant="light"
+              :columns="activityColumns"
+              :dataSource="permissionsByGroup"
+              rowKey="id"
+              class="table table-striped table-hover table-bordered"
             >
               <template v-slot:cell(hasPermission)="data">
                 <div class="text-center">
-                  <input
-                    type="checkbox"
+                  <a-checkbox
                     v-model="data.item.hasPermission"
                     @change.prevent="updatePermissionInRole(data)"
                   />
@@ -123,12 +107,13 @@ export default {
         {
           key: "selected",
           label: "",
-          thStyle: { width: "30px !important", minWidth: "30px !important" },
+         
         },
         {
           key: "name",
           label: "Group",
-          thStyle: { width: "300px !important", minWidth: "130px !important" },
+          dataIndex: "name",
+          
           sortable: true,
         },
       ],
@@ -137,12 +122,12 @@ export default {
         {
           key: "selected",
           label: "",
-          thStyle: { width: "30px !important", minWidth: "30px !important" },
+         
         },
         {
           key: "name",
           label: "Role",
-          thStyle: { width: "500px !important", minWidth: "160px !important" },
+        
           sortable: true,
         },
       ],
@@ -151,12 +136,12 @@ export default {
         {
           key: "hasPermission",
           label: "",
-          thStyle: { width: "60px !important", minWidth: "60px !important" },
+          
         },
         {
           key: "name",
           label: "Permission",
-          thStyle: { width: "400px !important", minWidth: "160px !important" },
+          
           sortable: true,
         },
       ],
@@ -208,13 +193,15 @@ export default {
       if (this.item_selected == null) {
         return;
       }
-      axios.put(`api/role/${this.item_selected[0].id}/permissions`, {
-        id: data.item.id,
-        hasPermission: data.ite.hasPermission,
-      }).then((res)=> {})
-      .catch((err)=> {
-        this.$toast.error(err.response.data,"Error", {timeout : 3000});
-      });
+      axios
+        .put(`api/role/${this.item_selected[0].id}/permissions`, {
+          id: data.item.id,
+          hasPermission: data.ite.hasPermission,
+        })
+        .then((res) => {})
+        .catch((err) => {
+          this.$toast.error(err.response.data, "Error", { timeout: 3000 });
+        });
     },
   },
 };

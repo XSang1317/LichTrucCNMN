@@ -1,10 +1,10 @@
 import admin1 from "../pages/admin/admin.vue"
 import staffs from "../pages/admin/staff/index.vue"
-import roles from "../pages/admin/role/Roles.vue"
+import roles from "../pages/admin/role/index.vue"
 import areas from "../pages/admin/areas/index.vue"
 import shifts from "../pages/admin/Shifts.vue"
 import shiftstype from "../pages/admin/Shiftstype.vue"
-import permissions from "../pages/admin/Permission.vue"
+import permissions from "../pages/admin/permission/index.vue"
 const admin = [
     {
         path: "/admin",
@@ -14,9 +14,13 @@ const admin = [
             {
                 path: "staffs",
                 name: "admin-staffs",
-                component: staffs, 
+                component: staffs,
             },
-           
+            {
+                path: "staffs/create",
+                name: "admin-staffs-create",
+                component: () => import("../pages/admin/staff/create.vue")
+            },
             /* Quản lý ca làm */
             {
                 path: "shifts",
@@ -38,10 +42,10 @@ const admin = [
             {
                 path: "areas/create",
                 name: "admin-areas-create",
-                component: () => import ("../pages/admin/areas/create.vue")
+                component: () => import("../pages/admin/areas/create.vue")
             },
-             /* Quản lý quyền */
-             {
+            /* Quản lý quyền */
+            {
                 path: "roles",
                 name: "admin-roles",
                 component: roles
@@ -49,11 +53,11 @@ const admin = [
             {
                 path: "role/create",
                 name: "admin-role-create",
-                component: () => import ("../pages/admin/role/create.vue")
+                component: () => import("../pages/admin/role/create.vue")
             },
 
             {
-                path:"permissions",
+                path: "permissions",
                 name: "admin-permissions",
                 component: permissions
             }

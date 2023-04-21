@@ -3,7 +3,7 @@
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-end">
         <a-button type="primary">
-          <router-link>
+          <router-link to="admin-staff-create">
             <i class="fa-solid fa-plus"></i>
           </router-link>
         </a-button>
@@ -53,6 +53,7 @@ export default defineComponent({
       {
         title: "#",
         key: "index",
+        width: 50,
       },
       {
         title: "Avatar",
@@ -60,18 +61,19 @@ export default defineComponent({
       },
       {
         title: "Tài khoản",
-        dataIndex: "Username",
+        dataIndex: "username",
         key: "username",
       },
       {
         title: "Họ Tên",
-        dataIndex: "Name",
+        dataIndex: "name",
         key: "name",
       },
       {
         title: "Email",
-        dataIndex: "Email",
+        dataIndex: "email",
         key: "email",
+        width: 250,
       },
       {
         title: "Phòng ban",

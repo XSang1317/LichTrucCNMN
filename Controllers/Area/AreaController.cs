@@ -6,6 +6,8 @@ using LichTruc.Data;
 using LichTruc.Data.Entities;
 using System.Security.Claims;
 using System.Linq;
+using System.Reflection.Metadata;
+using LichTruc.Utils;
 
 namespace LichTruc.Controllers.Areas
 {
@@ -18,14 +20,14 @@ namespace LichTruc.Controllers.Areas
         {
             this.db = db;
         }
-        public interface IAreaController
-        {
-            Task<IActionResult> GetAllAreas();
-            Task<IActionResult> GetArea(int id);
-            Task<IActionResult> CreateArea(LichTruc.Data.Entities.Area model);
-            Task<IActionResult> UpdateArea(int id, LichTruc.Data.Entities.Area model);
-            Task<IActionResult> DeleteArea(int id);
-        }
+        //public interface IAreaController
+        //{
+        //    Task<IActionResult> GetAllAreas();
+        //    Task<IActionResult> GetArea(int id);
+        //    Task<IActionResult> CreateArea(LichTruc.Data.Entities.Area model);
+        //    Task<IActionResult> UpdateArea(int id, LichTruc.Data.Entities.Area model);
+        //    Task<IActionResult> DeleteArea(int id);
+        //}
         //Get all
         //[HttpGet]
         //public IActionResult GetAreas()
@@ -63,38 +65,26 @@ namespace LichTruc.Controllers.Areas
 
             return Ok(areaModels);
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetArea(int id)
-        {
-            var area = await db.Areas.FindAsync(id);
-            if (area == null)
-            {
-                return NotFound();
-            }
+        //[HttpGet]
+        //public IActionResult GetAllArea(String msg)
+        //{
+        //    var query = $"%{msg?.ToLower()}%";
 
-            var areaModel = new LichTruc.Data.Entities.Area
-            {
-                Id = area.Id,
-                Name = area.Name,
-                code = area.code,
-                Description = area.Description,
-                CreatedAt = area.CreatedAt,
-                UpdatedAt = area.UpdatedAt,
-                DeletedAt = area.DeletedAt,
-                CreatedBy = area.CreatedBy,
-                UpdatedBy = area.UpdatedBy
-            };
-
-            return Ok(areaModel);
-        }
+        //    var areaType = db.Areas.Where(x => (string.IsNullOrEmpty(msg) ||
+        //        (EF.Functions.Like(x.Name.ToLower(), query)) ||
+        //        (EF.Functions.Like(x.Description.ToLower(), query))) && x.Id != Utils.Constant.BLANK_CONTRACT_TYPE_ID).
+        //        Select(x => new { x.Id, x.Name, x.Description }).AsNoTracking().ToList();
+        //    return Ok(areaType);
+        //}
         [HttpPost]
         public async Task<IActionResult> CreateArea([FromBody] LichTruc.Data.Entities.Area model)
         {
             var area = new LichTruc.Data.Entities.Area
             {
                 Name = model.Name,
+                Description = model.Description,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = "",
+               // CreatedBy = "",
             };
 
             await db.Areas.AddAsync(area);
@@ -112,8 +102,9 @@ namespace LichTruc.Controllers.Areas
             }
 
             area.Name = model.Name;
+            area.Description = model.Description;
             area.UpdatedAt = DateTime.UtcNow;
-            area.UpdatedBy = "Admin";
+            //area.UpdatedBy = "Admin";
 
             await db.SaveChangesAsync();
 
@@ -130,7 +121,7 @@ namespace LichTruc.Controllers.Areas
             }
 
             area.DeletedAt = DateTime.UtcNow;
-            area.UpdatedBy = "admin";
+            //area.UpdatedBy = "admin";
 
             await db.SaveChangesAsync();
 

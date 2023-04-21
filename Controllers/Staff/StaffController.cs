@@ -78,7 +78,9 @@ namespace LichTruc.Controllers.Staff
             {
                 Name = staff.Name,
                 areaId = staff.areaId,
-                areaName = area.Name // Gán AreaName từ thông tin của Area
+                areaName = area.Name, // Gán AreaName từ thông tin của Area
+                CreatedAt = DateTime.Now,
+                CreatedBy = staff.Name,
             };
 
             // Lưu đối tượng Staff vào database

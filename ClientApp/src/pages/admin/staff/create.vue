@@ -253,14 +253,14 @@ export default defineComponent({
       email: "",
       password: "",
       password_confirmation: "",
-      department_id: [],
+      area_name: [],
       status_id: []
     });
 
     const errors = ref({});
 
     const getUsersCreate = () => {
-      axios.get("/api/staff/create")
+      axios.get("/api/staff/createnewstaff")
       .then((response) => {
         users_status.value = response.data.users_status;
         departments.value = response.data.departments;

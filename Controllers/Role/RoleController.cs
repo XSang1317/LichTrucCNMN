@@ -16,13 +16,10 @@ namespace LichTruc.Controllers.Role
             this.db = db;
         }
         [HttpGet]
-        public async Task<IActionResult> Index(string q)
+        public IActionResult GetRoles()
         {
-            var Query = $"%{q?.ToLower()}%";
-
-            var items = db.Roles.Where(x => string.IsNullOrEmpty(q) || (EF.Functions.Like(x.name.ToLower(), Query)))
-                                .Select(x=> new {x.id, x.name}).OrderBy(x=>x.name).ToList();
-            return Ok(new {items});
+            var roles = db.Roles.ToList();
+            return Ok(roles);
         }
         [HttpGet]
         [Route("{id?}/staff")]

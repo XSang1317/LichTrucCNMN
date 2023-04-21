@@ -1,21 +1,112 @@
 <template>
-  <a-card title="Nhân viên" style="100%">
-    <div class="row">
-      <div class="col-12">
-        <a-table :dataSource="dataSource" :columns="columns"/>
-      </div>
+  <div id="content-wrapper">
+    <div class="container-fluid">
+      <a-row>
+        <a-col cols="12">
+          <div class="form-inline">
+            <a-button
+              class="btn-sm border-0 btn-info mb-1 mr-2"
+              style="float: right"
+              type="primary"
+              shape="round"
+              @click.prevent="openCreateModal"
+            >
+              <span><i class="fa-solid fa-user-plus" /> Add User</span>
+            </a-button>
+          </div>
+        </a-col>
+        <a-col cols="12">
+          <div class="form-inline">
+            <a-input-search
+              class="mb-2 mr-2 h-auto pt-0 d-sm"
+              style="flex-grow: 1; width: 100px"
+              v-model="query"
+              placeholder="Search by Username, Email or Full Name"
+              @keydown.enter.prevent="queryItem"
+              @click.prevent="queryItem"
+            />
+            <!--  <a-button
+              class="btn-sm border-0 btn-outline-secondary mb-2"
+              style="float: right"
+              @click.prevent="queryItem"
+            >
+              <i class="fas fa-search"></i>
+            </a-button> -->
+          </div>
+        </a-col>
+      </a-row>
+
+      <a-table
+        :aria-colcount="colums"
+        :datas-source="dataSource"
+        hover
+        responsive
+        :aria-sort="username"
+        bordered
+        :fields="staff_fields"
+        :items="staff_items"
+        class-name="table-light"
+      >
+        <template v-slot:cell(username)="data">
+          {{ data.value }}
+        </template>
+
+        <template v-slot:cell(area)="data">
+          <div class="text-center">
+            {{ findPickList(area_items, data.item.area) }}
+          </div>
+        </template>
+        <template v-slot:cell(status)="data">
+          <div class="text-center">
+            <a-badge v-if="data.item.status == 1" color="green"> Active </a-badge>
+            <a-badge v-else color="red"> Deactive </a-badge>
+          </div>
+        </template>
+      </a-table>
     </div>
-  </a-card>
+  </div>
+  <a-modal
+    content-class="border-0 p-0"
+    v-model="creatModelShow"
+    aria-setsize="m"
+    :maskClosable="false"
+    hide-footer
+  >
+    <template v-slot:modal-title> </template>
+    <a-form aria-autocomplete="off" @keydown.enter.prevent="submitCreate">
+      <a-row>
+        <a-col>
+          <a-form>
+            <template v-slot:label> Username </template>
+            <a-input
+              v-model="staff.username"
+              class="h-auto pt-0 pb-0"
+              oninvalid="this.SetCustiomValidity('Please enter Username')"
+              oninput="setCustomValidity('')"
+              aria-required
+            />
+          </a-form>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col>
+          <a-form>
+            <a-form-item></a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+    </a-form>
+  </a-modal>
+
 </template>
 <script>
 import { useMenu } from "../../stores/user-menu";
 import axios from "axios";
 export default {
-  name: "Users",
-  components: {
-    ////////////////////////////////
-  },
   computed: {
+  name: "Staffs",
+  /* computed: {
+
     auth() {
       return this.$store.state.auth;
     },
@@ -39,6 +130,9 @@ export default {
       query: null,
       creatModelShow: false,
       editModalShow: false,
+
+      uploadImage: false,
+      isImageUploading: false,
 
       staff_fields: [
         {
@@ -76,7 +170,8 @@ export default {
           thStyle: { with: "100px !importand" },
         },
         {
-          key: "status",
+
+          key:"status",
           lable: "Status",
           sorttbale: true,
           thStyle: {
@@ -92,6 +187,7 @@ export default {
           thStyle: { width: "50px !important", minWidth: "50px !important" },
         },
       ],
+
       staff_items: [],
       currentIndex: -1,
       user: {
@@ -114,6 +210,7 @@ export default {
       axios.spread((staff, area) => {
         next((vn) => vn.initData(staff.data));
       })
+
     );
   },
   beforeRouteUpdate(to, from, next) {
@@ -126,7 +223,9 @@ export default {
       .catch((err) => {
         next();
       });
-  },
+
+  }, */
+
   methods: {
     initData(staff, area) {
       this.staff_items = staff;
@@ -230,7 +329,7 @@ export default {
       this.staff.status = this.staff.status == "1" ? 1 : 0;
       this.staff.UpdatedBy = this.$store.state.auth.usernameId;
       axios
-        .put("/api/Staffs", this.staff)
+        .put("/api/staff", this.staff)
         .then((res) => {
           const staff_edit = this.$copy(this.staff);
           this.staff_items.splice(this.currentIndex, 1, staff_edit);
@@ -249,5 +348,5 @@ export default {
   setup() {
     useMenu().onSelectedKeys(["admin-staffs"]);
   },
-};
+};}
 </script>

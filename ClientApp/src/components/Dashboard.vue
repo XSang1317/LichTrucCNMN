@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import PopMenu from "./sidebar/PopMenu.vue";
 import { defineComponent, ref } from "vue";
 export default defineComponent({
   components: {

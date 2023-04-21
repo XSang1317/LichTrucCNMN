@@ -792,6 +792,7 @@ export const customModelFields = {
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
+
 const parseAdjust = (eventDate) => {
     const date = new Date(eventDate);
     date.setFullYear(currentYear);
@@ -802,6 +803,7 @@ const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + mi
 
 //export const displayDate = new Date(Date.UTC(currentYear, currentMonth, 24));
 export const displayDate = new Date().now;
+
 export const sampleData = baseData.map(dataItem => (
     {
         id: dataItem.TaskID,

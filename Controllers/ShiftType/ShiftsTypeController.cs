@@ -18,13 +18,17 @@ namespace LichTruc.Controllers.ShiftType
             this.db = db;
         }
 
+
         [HttpGet]
+
         public IActionResult GetAllType()
         {
             var items = db.Types.AsNoTracking().OrderBy(x=>x.name).ToList();
             return Ok(items);
         }
+
         [HttpPost]
+
         public IActionResult PostShiftType([FromBody] ShiftsType type)
         {
             try
@@ -47,7 +51,9 @@ namespace LichTruc.Controllers.ShiftType
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut]
+
         public IActionResult UpdateShiftType([FromBody] ShiftsType type)
         {
             var item = db.Types.FirstOrDefault(i => i.name == type.name && i.id == type.id);
@@ -72,7 +78,9 @@ namespace LichTruc.Controllers.ShiftType
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpDelete("{id}")]
+
         public IActionResult DeleteId(int id)
         {
 

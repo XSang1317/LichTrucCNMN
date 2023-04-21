@@ -29,7 +29,6 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.0.33",
     "vue": "^3.2.37",
-    "vue-autosuggest": "^2.2.0",
     "vue-loader-v16": "^16.0.0-beta.5.4",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0"

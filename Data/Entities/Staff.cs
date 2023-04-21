@@ -33,6 +33,7 @@ namespace LichTruc.Data.Entities
         public virtual Area Area { get; set; } //FK to Area
         public virtual ICollection<Shifts>? Shifts { get; set; } //Thuoc tinh dieu huong
 
+
         //Defaults
         [Column(TypeName = "smalldatetime")]
         public DateTime? CreatedAt { get; set; }
@@ -44,6 +45,7 @@ namespace LichTruc.Data.Entities
         public DateTime? DeletedAt { get; set; }
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
+
 
         //Link FK
         public IList<StaffHasRole>? StaffHasRoles { get; set; }

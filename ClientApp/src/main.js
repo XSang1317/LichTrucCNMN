@@ -2,12 +2,14 @@ import 'bootstrap/dist/css/bootstrap.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+
 import axios from 'axios'
 window.axios = axios;
 ////////////////////////////////////////////////////////////////
 import { createPinia } from 'pinia'
 import "./style.css"
 //import "./../dist/output.css"
+
 import Antd from 'ant-design-vue';
 import "ant-design-vue/dist/antd.css"
 import "bootstrap/dist/css/bootstrap-grid.min.css"

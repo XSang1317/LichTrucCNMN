@@ -32,6 +32,7 @@
       </a-form>
     </form>
   </div>
+
 </template>
 
 <script>
@@ -54,11 +55,13 @@ export default {
     login() {
       this.loading = true;
       const payload = {
+
         username: this.Username,
         password: this.password,
       };
       axios
         .post("/api/authetication/Staffs", payload)
+
         .then((response) => {
           const auth = response.data;
           this.$log(auth.status);
@@ -67,7 +70,9 @@ export default {
           axios.defaults.headers.common["Authorization"] = `Bearer ${auth.accessToken}`;
           this.$store.commit("loginSuccess", auth);
           this.error = null;
+
           this.Username = "";
+
           this.email = "";
           this.password = "";
           this.loading = false;

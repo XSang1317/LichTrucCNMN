@@ -11,9 +11,11 @@ namespace LichTruc.Data.Entities
     {
         public int id { get; set; }
 
+
         [Required]
         [StringLength(255)]
         public string name { get; set; } = string.Empty;
+
 
         [Column(TypeName = "smalldatetime")]
         public DateTime? CreatedAt { get; set; }
@@ -28,8 +30,8 @@ namespace LichTruc.Data.Entities
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
 
-
         public IList<StaffHasRole> StaffHasRoles { get; set; }
         public IList<RoleHasPermission> RoleHasPermissions { get; set; }
+
     }
 }

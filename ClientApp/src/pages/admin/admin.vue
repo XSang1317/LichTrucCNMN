@@ -19,6 +19,7 @@
 </template>
 <script>
 import PopMenu from "../../components/sidebar/PopMenu.vue";
+
 import Dashboard from "../../components/Dashboard.vue";
 export default {
   components: {

@@ -12,9 +12,11 @@ namespace LichTruc.Data.Entities
         [Key]
         public int id { get; set; }
         public string name { get; set; } = "";
+
         [NotMapped]
         public TimeOnly timestar { get; set; }// giờ tối thiểu
         [NotMapped]
+
         public TimeOnly timeend { get; set; } // giờ tối đa
 
         //Foreign Key

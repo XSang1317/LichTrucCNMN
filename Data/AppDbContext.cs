@@ -31,7 +31,6 @@ namespace LichTruc.Data
         public DbSet<Schedule> Schedules { get; set; }
 
 
-        ////////////////////////
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Area>().ToTable("Area");
@@ -70,5 +69,6 @@ namespace LichTruc.Data
             .HasForeignKey(a => a.Id);
 
         }
+
     }
 }

@@ -1,13 +1,14 @@
+
 using LichTruc.Controllers.Areas;
 using LichTruc.Data;
 //using LichTruc.Interfaces;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net6_Controller_And_VIte;
 using System.Diagnostics;
 using System.Text;
-//using static LichTruc.Controllers.Staff.StaffController;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,14 +19,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 // In production, the Vite files will be served from this directory
 builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "ClientApp/dist";
 });
-
-
 
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseSqlServer(builder.Configuration
@@ -82,6 +80,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     //app.UseDeveloperExceptionPage();
+
 }
 
 app.UseHttpsRedirection();
@@ -92,8 +91,10 @@ app.UseSpaStaticFiles();
 
 app.UseRouting();
 
+
 app.UseAuthorization();
 app.UseAuthentication();
+
 
 app.UseEndpoints(endpoints => endpoints.MapControllers());
 
@@ -101,8 +102,10 @@ app.UseSpa(spa =>
 {
     if (app.Environment.IsDevelopment())
         spa.UseViteDevelopmentServer(sourcePath: "ClientApp");
+
     else
         spa.UseViteDevelopmentServer(sourcePath: "dist");
+
 });
 
 app.Run();

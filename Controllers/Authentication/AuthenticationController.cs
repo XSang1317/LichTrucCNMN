@@ -28,7 +28,9 @@ namespace LichTruc.Controllers.Authentication
         }
         public class StaffLoginModel
         {
+
             public string Username { get; set; }
+
             public string password { get; set; }
         }
         [HttpPost("staff")]
@@ -37,7 +39,9 @@ namespace LichTruc.Controllers.Authentication
             var errorMessage = " The username or password is incorrect. Please try again";
             if (!ModelState.IsValid) return BadRequest(errorMessage);
 
+
             var staff = db.Staffs.FirstOrDefault(x => x.Username == model.Username && x.DeletedAt == null);
+
             if (staff == null) return BadRequest(errorMessage);
 
             if (staff.status == 0) return BadRequest("Account has no access permission");
@@ -81,6 +85,7 @@ namespace LichTruc.Controllers.Authentication
             var token = new JwtSecurityToken(
                 configuration["Jwt:Issuer"],
                 configuration["Jwt:Audience"],
+
                 claims,
                 expires:expires,
                 signingCredentials:creds

@@ -2,10 +2,6 @@
   <router-view />
 </template>
 
-<script lang="js">
-
-</script>
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

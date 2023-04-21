@@ -31,7 +31,6 @@ export default {
   },
   data() {
     return {
-     
       dataItems: sampleDataWithCustomSchema,
       customModelFields: customModelFields,
       view: 'day',

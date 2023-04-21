@@ -14,6 +14,7 @@ namespace LichTruc.Data.Entities
         public string code { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty; 
 
+
         //Defaults
         [Column(TypeName = "smalldatetime")]
         public DateTime? CreatedAt { get; set; }
@@ -23,10 +24,12 @@ namespace LichTruc.Data.Entities
 
         [Column(TypeName = "smalldatetime")]
         public DateTime? DeletedAt { get; set; }
+
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
         //Foreign Key
         public ICollection<Staff>? Staff { get; set; }
         public virtual ICollection<Shifts>? Shifts { get; set; }
+
     }
 }

@@ -53,7 +53,7 @@ export default defineComponent({
       {
         title: "#",
         key: "index",
-        width: 50,  
+        width: 50,
       },
       {
         title: "Avatar",

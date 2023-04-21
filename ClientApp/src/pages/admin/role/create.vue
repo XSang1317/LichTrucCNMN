@@ -13,7 +13,7 @@
                     'text-danger': errors.Name,
                   }"
                 >
-                  Quyền:
+                  Tên Khu Vực:
                 </span>
               </label>
             </div>
@@ -34,6 +34,37 @@
             </div>
           </div>
           <!-- Description -->
+          <div class="row mb-3">
+            <div class="col-12 col-sm-3 text-start text-sm-end">
+              <label>
+                <span class="text-danger me-1">*</span>
+                <span
+                  :class="{
+                    'text-danger': errors.Description,
+                  }"
+                >
+                  Mô tả:
+                </span>
+              </label>
+            </div>
+
+            <div class="col-12 col-sm-5">
+              <a-input
+                placeholder="Description"
+                allow-clear
+                v-model:value="Description"
+                :class="{
+                  'input-danger': errors.Description,
+                }"
+              />
+
+              <div class="w-100"></div>
+
+              <small v-if="errors.Description" class="text-danger">{{
+                errors.Description[0]
+              }}</small>
+            </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -63,13 +94,15 @@ export default defineComponent({
     useMenu().onSelectedKeys(["admin-roles"]);
     const router = useRouter();
     const newRoles = reactive({
-      name: "",
+      Name: "",
+      Description: "",
+      //CreatedAt: "",
     });
     const errors = ref({});
     const filterOption = (input, option) => {
       return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     };
-    const createRoles = () => {
+    const createArea = () => {
       axios
         .post("/api/role", newRoles)
         .then((response) => {
@@ -85,8 +118,17 @@ export default defineComponent({
     return {
       errors,
       filterOption,
-      createRoles,
+      createArea,
     };
   },
+  /* data() {
+    return {
+      newArea: {
+        name: "",
+        description: "",
+      },
+    };
+  }, */
+  methods: {},
 });
 </script>

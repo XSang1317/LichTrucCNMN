@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace LichTruc.Data.Entities
 {
@@ -11,13 +12,11 @@ namespace LichTruc.Data.Entities
     {
         [Key]
         public int id { get; set; }
-        public string name { get; set; } = "";
+        public string name { get; set; } = string.Empty;
 
-        [NotMapped]
-        public TimeOnly timestar { get; set; }// giờ tối thiểu
-        [NotMapped]
+        public TimeSpan timestart { get; set; }// giờ tối thiểu
 
-        public TimeOnly timeend { get; set; } // giờ tối đa
+        public TimeSpan timeend { get; set; } // giờ tối đa
 
         //Foreign Key
         public virtual ICollection<Shifts>? Shifts { get; set; }

@@ -20,79 +20,77 @@ namespace LichTruc.Controllers.ShiftType
 
 
         [HttpGet]
-
-        public IActionResult GetAllType()
+        public async Task<ActionResult<IEnumerable<Data.Entities.ShiftsType>>> GetShiftTypes()
         {
-            var items = db.Types.AsNoTracking().OrderBy(x=>x.name).ToList();
-            return Ok(items);
+            return await db.ShiftsTypes.ToListAsync();
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Data.Entities.ShiftsType>> GetShiftType(int id)
+        {
+            var shiftType = await db.ShiftsTypes.FindAsync(id);
+
+            if (shiftType == null)
+            {
+                return NotFound();
+            }
+
+            return shiftType;
         }
 
         [HttpPost]
-
-        public IActionResult PostShiftType([FromBody] ShiftsType type)
+        public async Task<ActionResult<ShiftsType>> PostShiftType(ShiftsType shiftType)
         {
+            db.ShiftsTypes.Add(shiftType);
+            await db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetShiftType), new { id = shiftType.id }, shiftType);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutShiftType(int id, Data.Entities.ShiftsType shiftType)
+        {
+            if (id != shiftType.id)
+            {
+                return BadRequest();
+            }
+
+            db.Entry(shiftType).State = EntityState.Modified;
+
             try
             {
-                var item = db.Types.FirstOrDefault(i => i.name == type.name);
-                if (item != null)
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ShiftTypeExists(id))
                 {
-                    return BadRequest("Tên ca làm đã tồn tại");
+                    return NotFound();
                 }
-                var staffId = User.FindFirstValue(ClaimTypes.Sid);
-                type.CreatedAt = DateTime.Now;
-                type.CreatedBy = Convert.ToInt32(staffId);
-
-                db.Types.Add(type);
-                db.SaveChanges();
-                return Ok(type);
+                else
+                {
+                    throw;
+                }
             }
-            catch (Exception ex)
+
+            return NoContent();
+        } 
+            [HttpDelete("{id}")]
+            public async Task<IActionResult> DeleteShiftType(int id)
             {
-                return BadRequest(ex.Message);
+                var shiftType = await db.ShiftsTypes.FindAsync(id);
+                if (shiftType == null)
+                {
+                    return NotFound();
+                }
+
+                db.ShiftsTypes.Remove(shiftType);
+                await db.SaveChangesAsync();
+
+                return NoContent();
             }
-        }
-
-        [HttpPut]
-
-        public IActionResult UpdateShiftType([FromBody] ShiftsType type)
+            private bool ShiftTypeExists(int id)
         {
-            var item = db.Types.FirstOrDefault(i => i.name == type.name && i.id == type.id);
-            if (item != null)
-            {
-                return BadRequest("Tên ca làm đã tồn tại");
-            }
-            try
-            {
-                var staffId = User.FindFirstValue(ClaimTypes.Sid);
-
-                type.UpdatedAt = DateTime.Now;
-                type.UpdatedBy = Convert.ToInt32(staffId);
-
-                db.Types.Update(item);
-                db.SaveChanges();
-
-                return Ok(type);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpDelete("{id}")]
-
-        public IActionResult DeleteId(int id)
-        {
-
-            var item = db.Types.FirstOrDefault(x => x.id == id);
-
-            item.DeletedAt = DateTime.Now;
-            item.name = item.name + "_x_" + DateTime.Now.ToString("ddMMyyHHmmss"); //Name la duy nhat
-
-            db.Types.Update(item);
-            db.SaveChanges();
-
-            return Ok(item);
+            return db.ShiftsTypes.Any(e => e.id == id);
         }
     }
 }

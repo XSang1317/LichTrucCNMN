@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button variant="primary">Primary Button</b-button>
+    <a-button type="primary">Shifts</a-button>
   </div>
 </template>
 <script>

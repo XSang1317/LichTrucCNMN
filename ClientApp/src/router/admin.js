@@ -4,7 +4,8 @@ import staffs from "../pages/admin/users/index.vue"
 import roles from "../pages/admin/role/index.vue"
 import areas from "../pages/admin/areas/index.vue"
 import shifts from "../pages/admin/Shifts.vue"
-import shiftstype from "../pages/admin/Shiftstype.vue"
+import shiftstype from "../pages/admin/shiftType/index.vue"
+
 import permissions from "../pages/admin/permission/index.vue"
 
 const admin = [
@@ -47,11 +48,6 @@ const admin = [
                 name: "admin-areas",
                 component: areas
             },
-           /*  {
-                path: "areas/create",
-                name: "admin-areas-create",
-                component: () => import("../pages/admin/areas/create.vue")
-            }, */
             {
                 path: "areas/edit",
                 name: "admin-areas-edit",
@@ -64,11 +60,6 @@ const admin = [
                 name: "admin-roles",
                 component: roles
             },
-           /*  {
-                path: "role/create",
-                name: "admin-role-create",
-                component: () => import("../pages/admin/role/create.vue")
-            }, */
 
             {
                 path: "permissions",

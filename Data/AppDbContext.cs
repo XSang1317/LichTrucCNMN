@@ -17,7 +17,7 @@ namespace LichTruc.Data
 
         public DbSet<Area> Areas { get; set; }
         public DbSet<Shifts> Shifts { get; set; }
-        public DbSet<ShiftsType> Types { get; set; }
+        public DbSet<ShiftsType> ShiftsTypes { get; set; }
 
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }

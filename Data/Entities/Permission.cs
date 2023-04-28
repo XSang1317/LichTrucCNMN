@@ -10,13 +10,13 @@ namespace LichTruc.Data.Entities
     public class Permission
     {
         public int id { get; set; }
-        [Required]
+        //[Required]
         [StringLength(255)]
         public string? code { get; set; }
-        [Required]
+        //[Required]
         [StringLength(255)]
         public string? name { get; set; }
-        [Required]
+        //[Required]
         [StringLength(255)]
         public string? description { get; set; }
 
@@ -29,7 +29,8 @@ namespace LichTruc.Data.Entities
 
         //FK
         public int? PermissionGroupId { get; set; }
-        public PermissionGroup? PermissionGroup { get; set; }
+
+        public PermissionGroup PermissionGroup { get; set; }
 
         //
         public IList<RoleHasPermission>? RoleHasPermissions { get; set; }

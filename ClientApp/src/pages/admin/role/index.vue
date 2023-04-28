@@ -1,107 +1,95 @@
 <template>
-  <a-card id="content-wrapper">
-    <div class="container-fluid">
+  <div>
+    <a-card title="Danh sách Quyền">
       <div class="row mb-3">
-        <a-col :span="24">
-          <div class="form-inline">
-            <a-button
-              type="primary"
-              shape="round"
-              :size="size"
-              class="btn-sm border-0 btn-info mb-1 mr-2"
-              style="float: right"
-            >
-              <router-link :to="{ name: 'admin-role-create' }">
-                <i class="fa-solid fa-plus"></i>Thêm quyền
-              </router-link>
-            </a-button>
-          </div>
-        </a-col>
-      </div>
-
-      <div class="row">
-        <div class="col-12">
-          <a-table :dataSource="users" :columns="columns" :scroll="{ x: 576 }">
-            <template #bodyCell="{ column, index }">
-              <template v-if="column.key === 'index'">
-                <span>{{ index + 1 }}</span>
-              </template>
-
-              <!--  <template v-if="column.key === 'status'">
-              <span v-if="record.status_id == 1" class="text-primary">{{ record.status }}</span>
-              <span v-else-if="record.status_id == 2" class="text-danger">{{ record.status }}</span>
-            </template> -->
-              <template v-else-if="column.dataIndex === 'action'">
-                <a-popconfirm
-                  v-if="users.length"
-                  title="Sure to delete?"
-                  @confirm="onDelete(record.key)"
-                >
-                  <a>Delete</a>
-                </a-popconfirm>
-              </template>
-            </template>
-          </a-table>
+        <div class="col-12 d-flex justify-content-end">
+          <add-role></add-role>
         </div>
       </div>
-    </div>
-  </a-card>
-</template>
-<script>
-import { defineComponent, ref } from "vue";
-import { useMenu } from "../../../stores/user-menu.js";
-export default defineComponent({
-  setup() {
-    useMenu().onSelectedKeys(["admin-roles"]);
+      <a-table :columns="columns" :dataSource="areaList">
+        <template #bodyCell="{ column, index, record }">
+          <template v-if="column.key === 'index'">
+            <span>{{ index + 1 }}</span>
+          </template>
 
-    const users = ref([]);
+          <template v-else-if="column.key === 'actions'">
+            <a-button type="submit" @click.prevent="showEditModal()">Edit</a-button>
+            <a-button type="submit" @click.prevent="deleteRole(record.id)">Delete</a-button>
+          </template>
+        </template>
+      </a-table>
+    </a-card>
+  </div>
+</template>
+
+<script>
+import { reactive, ref, onMounted } from "vue";
+import {message, Modal}from 'ant-design-vue';
+import axios from "axios";
+import addRole from "./addRole.vue";
+export default {
+  components: {
+    "add-role": addRole,
+    Modal,
+  },
+  setup() {
     const columns = [
       {
-        title: "#",
+        title: "STT",
         key: "index",
       },
       {
-        title: "Tên quyền",
+        title: "Quyền",
         dataIndex: "name",
         key: "name",
-        responsive: ["sm"],
       },
       {
         title: "Công cụ",
-        key: "action",
-        fixed: "right",
+        key: "actions",
       },
     ];
-    /* const handleTableChange = (pag, filters, sorter) => {
-      run({
-        results: pag.pageSize,
-        page: pag?.current,
-        sortField: sorter.field,
-        sortOrder: sorter.order,
-        ...filters,
-      });
-    }; */
-    const onDelete = (key) => {
-      dataSource.value = dataSource.value.filter((item) => item.key !== key);
-    };
-    const getUsers = () => {
+
+    const areaList = reactive([]);
+
+    /* GET LIST MODAL */
+    onMounted(() => {
       axios
         .get("/api/role")
         .then((response) => {
-          users.value = response.data;
+          areaList.push(...response.data);
         })
         .catch((error) => {
           console.log(error);
+          message.error("Thất bại lấy danh sách Quyền");
         });
+    });
+
+
+    /* DELTE MODAL */
+    const deleteRole = (role) => {
+      Modal.confirm({
+        title: "Bạn có chắc muốn xóa khu vực này?",
+        onOk: () => {
+          axios
+            .delete(`/api/role/${role}`)
+            .then(() => {
+              //area.splice(area.indexOf(area), 1);
+              message.success("Quyền đã được xóa ");
+              window.location.replace("/admin/roles");
+            })
+            .catch((error) => {
+              console.log(error);
+              message.error("Xóa quyền thất bại");
+            });
+        },
+      });
     };
-
-    getUsers();
-
     return {
-      users,
       columns,
-      onDelete,
+      areaList,
+      addRole,
+      deleteRole,
     };
   },
-});
+};
 </script>

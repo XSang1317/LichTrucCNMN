@@ -9,10 +9,11 @@ namespace LichTruc.Data.Entities
 {
     public class Area
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string code { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty; 
+        public string Description { get; set; } = string.Empty;
 
 
         //Defaults
@@ -25,8 +26,8 @@ namespace LichTruc.Data.Entities
         [Column(TypeName = "smalldatetime")]
         public DateTime? DeletedAt { get; set; }
 
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
         //Foreign Key
         public ICollection<Staff>? Staff { get; set; }
         public virtual ICollection<Shifts>? Shifts { get; set; }

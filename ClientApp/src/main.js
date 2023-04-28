@@ -15,7 +15,7 @@ import "ant-design-vue/dist/antd.css"
 import "bootstrap/dist/css/bootstrap-grid.min.css"
 import "./static/fontawesome-free-6.3.0-web/css/all.min.css"
 import '@progress/kendo-theme-default/dist/all.css';
-import { Scheduler } from '@progress/kendo-vue-scheduler'
+
 
 import 'bootstrap/dist/css/bootstrap.css'
 
@@ -26,9 +26,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css' */
 import '../node_modules/nprogress/nprogress.css' 
 
 const app = createApp(App)
-app.use(createPinia())
+app.config.productionTip = false;
+app.use(createPinia());
 //app.use(BootstrapVue)
-app.use(router)
-app.use(Antd)
-app.use(Scheduler);
+app.use(router);
+app.use(Antd);
 app.mount('#app')

@@ -163,7 +163,7 @@ export default {
     };
   },
   beforeRouteEnter(to, from, next) {
-    axios.all([axios.get("/api/role"), axios.get("/api/permissiongroups")]).then(
+    axios.all([axios.get("/api/role"), axios.get("/api/permissiongroup")]).then(
       axios.spread((role, permission_groups) => {
         next((vm) => vm.initData(role.data.items, permission_groups.data.items));
       })

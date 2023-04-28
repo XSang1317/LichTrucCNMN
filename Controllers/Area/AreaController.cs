@@ -22,14 +22,6 @@ namespace LichTruc.Controllers.Areas
             this.db = db;
         }
 
-        //public interface IAreaController
-        //{
-        //    Task<IActionResult> GetAllAreas();
-        //    Task<IActionResult> GetArea(int id);
-        //    Task<IActionResult> CreateArea(LichTruc.Data.Entities.Area model);
-        //    Task<IActionResult> UpdateArea(int id, LichTruc.Data.Entities.Area model);
-        //    Task<IActionResult> DeleteArea(int id);
-        //}
         //Get all
         //[HttpGet]
         //public IActionResult GetAreas()
@@ -37,36 +29,26 @@ namespace LichTruc.Controllers.Areas
         //    var areas = db.Areas.ToList();
         //    return Ok(areas);
         //}
-        //public class AreaModel
-        //{
-        //    public int Id { get; set; }
-        //    public string Name { get; set; }
-        //    public string Description { get; set; }
-        //    public DateTime? CreatedAt { get; set; }
-        //    public DateTime? UpdatedAt { get; set; }
-        //    public DateTime? DeletedAt { get; set; }
-        //    public string CreatedBy { get; set; }
-        //    public string UpdatedBy { get; set; }
-        //}
-        [HttpGet] ///Get all
-        public async Task<IActionResult> GetAllAreas()
-        {
-            var areas = await db.Areas.ToListAsync();
-            var areaModels = areas.Select(a => new LichTruc.Data.Entities.Area
-            {
-                Id = a.Id,
-                Name = a.Name,
-                code = a.code,
-                Description = a.Description,
-                CreatedAt = a.CreatedAt,
-                UpdatedAt = a.UpdatedAt,
-                DeletedAt = a.DeletedAt,
-                CreatedBy = a.CreatedBy,
-                UpdatedBy = a.UpdatedBy
-            }).ToList();
 
-            return Ok(areaModels);
-        }
+        //[HttpGet] ///Get all
+        //public async Task<IActionResult> GetAllAreas()
+        //{
+        //    var areas = await db.Areas.ToListAsync();
+        //    var areaModels = areas.Select(a => new LichTruc.Data.Entities.Area
+        //    {
+        //        Id = a.Id,
+        //        Name = a.Name,
+        //        code = a.code,
+        //        Description = a.Description,
+        //        CreatedAt = a.CreatedAt,
+        //        UpdatedAt = a.UpdatedAt,
+        //        DeletedAt = a.DeletedAt,
+        //        CreatedBy = a.CreatedBy,
+        //        UpdatedBy = a.UpdatedBy
+        //    }).ToList();
+
+        //    return Ok(areaModels);
+        //}
         //[HttpGet]
         //public IActionResult GetAllArea(String msg)
         //{
@@ -78,56 +60,157 @@ namespace LichTruc.Controllers.Areas
         //        Select(x => new { x.Id, x.Name, x.Description }).AsNoTracking().ToList();
         //    return Ok(areaType);
         //}
+        // GET: api/Areas
+        [HttpGet]
+        public IActionResult GetAreas()
+        {
+            var areas = db.Areas.ToList();
+            return Ok(areas);
+        }
+
+        // GET: api/Areas/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Data.Entities.Area>> GetArea(int id)
+        {
+            var area = await db.Areas.FindAsync(id);
+
+            if (area == null)
+            {
+                return NotFound();
+            }
+
+            return area;
+        }
+
+        // POST: api/Areas
+        //[HttpPost]
+        //public IActionResult CreateArea(Data.Entities.Area area)
+        //{
+        //    db.Areas.Add(area);
+        //    db.SaveChanges();
+        //    return CreatedAtAction(nameof(GetAreas), new { id = area.Id }, area);
+        //}
+        public class StoreAreaViewModel
+        {
+            public string? name { get; set; }
+            public string? description { get; set; }
+            public string? code { get; set; }
+            public int CreatedBy { get; set; }
+        }
         [HttpPost]
-        public async Task<IActionResult> CreateArea([FromBody] LichTruc.Data.Entities.Area model)
+        public async Task<IActionResult> Store([FromBody] StoreAreaViewModel model)
         {
-            var area = new LichTruc.Data.Entities.Area
+            try
             {
-                Name = model.Name,
-                Description = model.Description,
-                CreatedAt = DateTime.UtcNow,
-               // CreatedBy = "",
-            };
-
-            await db.Areas.AddAsync(area);
-            await db.SaveChangesAsync();
-
-            return Ok();
+                var item = db.Areas.FirstOrDefault(i => i.Name == model.name &&  i.Description == model.description);
+               
+                if (item != null)
+                    return BadRequest("Group name already exists");
+                item = new Data.Entities.Area()
+                {
+                    Name = model.name,
+                    Description = model.description,
+                    code = "",
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = model.CreatedBy,
+                };
+                db.Areas.Add(item);
+                db.SaveChanges();
+                return Ok(new { item });
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
         }
+        //[HttpPost]
+        //public IActionResult PostArea([FromBody] LichTruc.Data.Entities.Area model)
+        //{
+        //    try
+        //    {
+        //        //Check code area
+        //        var item = db.Areas.FirstOrDefault(i => i.code == model.code);
+        //        if (item != null)
+        //            return BadRequest("Mã khu vực đã tồn tại");
+        //        //Check name area
+        //        item = db.Areas.FirstOrDefault(i => i.Name == model.Name);
+        //        if (item != null)
+        //            return BadRequest("Tên khu vực đã tồn tại");
+        //        model.Description = model.Description;
+        //        model.CreatedAt = DateTime.Now;
+        //        //model.CreatedBy = 
+
+        //        db.Areas.Add(model);
+        //        db.SaveChanges();
+        //        return Ok(model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+        // PUT: api/Areas/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArea(int id, [FromBody] LichTruc.Data.Entities.Area model)
+        public async Task<IActionResult> PutArea(int id, Data.Entities.Area area)
         {
-            var area = await db.Areas.FindAsync(id);
-            if (area == null)
+            if (id != area.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            area.Name = model.Name;
-            area.Description = model.Description;
-            area.UpdatedAt = DateTime.UtcNow;
-            //area.UpdatedBy = "Admin";
+            db.Entry(area).State = EntityState.Modified;
 
-            await db.SaveChangesAsync();
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AreaExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            return Ok();
+            return NoContent();
         }
+        //[HttpPut("{id}")]
+        //public IActionResult UpdateArea(int id, Data.Entities.Area area)
+        //{
+        //    var areaToUpdate = db.Areas.Find(id);
+        //    if (areaToUpdate == null)
+        //        return NotFound();
+        //    areaToUpdate.Name = area.Name;
+        //    areaToUpdate.Description = area.Description;
+        //    db.Areas.Update(areaToUpdate);
+        //    db.SaveChanges();
+        //    return NoContent();
+        //}
+        // DELETE: api/Areas/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteArea(int id)
+        //{
+        //    var area = await db.Areas.FindAsync(id);
+        //    if (area == null)
+        //    {
+        //        return NotFound();
+        //    }
 
+        //    db.Areas.Remove(area);
+        //    await db.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteArea(int id)
+        public IActionResult DeleteArea(int id)
         {
-            var area = await db.Areas.FindAsync(id);
-            if (area == null)
-            {
+            var areaToDelete = db.Areas.Find(id);
+            if (areaToDelete == null)
                 return NotFound();
-            }
-
-            area.DeletedAt = DateTime.UtcNow;
-            //area.UpdatedBy = "admin";
-
-            await db.SaveChangesAsync();
-
-            return Ok();
+            db.Areas.Remove(areaToDelete);
+            db.SaveChanges();
+            return NoContent();
         }
 
         private bool AreaExists(int id)
@@ -137,82 +220,82 @@ namespace LichTruc.Controllers.Areas
 
 
 
-     /*    //Get all
-        [HttpGet, Authorize]
-        public IActionResult GetAllArea()
-        {
-            var items = db.Areas.AsNoTracking().OrderBy(x=>x.Name).ToList();
-            return Ok(items);
-        }
+        /*    //Get all
+           [HttpGet, Authorize]
+           public IActionResult GetAllArea()
+           {
+               var items = db.Areas.AsNoTracking().OrderBy(x=>x.Name).ToList();
+               return Ok(items);
+           }
 
-        [HttpPost, Authorize]
-        public IActionResult PostArea([FromBody] LichTruc.Data.Entities.Area model)
-        {
-            try
-            {
-                //Check code area
-                var item = db.Areas.FirstOrDefault(i => i.code == model.code);
-                if (item != null)
-                    return BadRequest("Mã khu vực đã tồn tại");
-                //Check name area
-                item = db.Areas.FirstOrDefault(i => i.Name == model.Name);
-                if (item != null)
-                    return BadRequest("Tên khu vực đã tồn tại");
+           [HttpPost, Authorize]
+           public IActionResult PostArea([FromBody] LichTruc.Data.Entities.Area model)
+           {
+               try
+               {
+                   //Check code area
+                   var item = db.Areas.FirstOrDefault(i => i.code == model.code);
+                   if (item != null)
+                       return BadRequest("Mã khu vực đã tồn tại");
+                   //Check name area
+                   item = db.Areas.FirstOrDefault(i => i.Name == model.Name);
+                   if (item != null)
+                       return BadRequest("Tên khu vực đã tồn tại");
 
-                var staffID = User.FindFirstValue(ClaimTypes.Sid);
-                model.CreatedAt = DateTime.Now;
-                model.CreatedBy = Convert.ToInt32(staffID);
+                   var staffID = User.FindFirstValue(ClaimTypes.Sid);
+                   model.CreatedAt = DateTime.Now;
+                   model.CreatedBy = Convert.ToInt32(staffID);
 
-                db.Areas.Add(model);
-                db.SaveChanges();
-                return Ok(model);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+                   db.Areas.Add(model);
+                   db.SaveChanges();
+                   return Ok(model);
+               }
+               catch (Exception ex)
+               {
+                   return BadRequest(ex.Message);
+               }
+           }
 
-        [HttpPut, Authorize]
-        public IActionResult UpdateArea([FromBody] LichTruc.Data.Entities.Area model)
-        {
-            var item = db.Areas.FirstOrDefault(i => i.code == model.code && i.Id != model.Id);
-            if (item != null)
-                return BadRequest("Mã khu vực đã tồn tại");
-            item = db.Areas.FirstOrDefault(i => i.Name == model.Name && i.Id != model.Id);
-            if (item != null)
-                return BadRequest("Tên khu vực đã tồn tại");
-            try
-            {
-                var staffId = User.FindFirstValue(ClaimTypes.Sid);
+           [HttpPut, Authorize]
+           public IActionResult UpdateArea([FromBody] LichTruc.Data.Entities.Area model)
+           {
+               var item = db.Areas.FirstOrDefault(i => i.code == model.code && i.Id != model.Id);
+               if (item != null)
+                   return BadRequest("Mã khu vực đã tồn tại");
+               item = db.Areas.FirstOrDefault(i => i.Name == model.Name && i.Id != model.Id);
+               if (item != null)
+                   return BadRequest("Tên khu vực đã tồn tại");
+               try
+               {
+                   var staffId = User.FindFirstValue(ClaimTypes.Sid);
 
-                model.UpdatedAt = DateTime.Now;
-                model.UpdatedBy = Convert.ToInt32(staffId);
+                   model.UpdatedAt = DateTime.Now;
+                   model.UpdatedBy = Convert.ToInt32(staffId);
 
-                db.Areas.Update(model);
-                db.SaveChanges();
+                   db.Areas.Update(model);
+                   db.SaveChanges();
 
-                return Ok(model);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpDelete("{id}"), Authorize]
-        public IActionResult DeleteId (int id)
-        {
-            var item = db.Areas.FirstOrDefault(x => x.Id == id);
+                   return Ok(model);
+               }
+               catch (Exception ex)
+               {
+                   return BadRequest(ex.Message);
+               }
+           }
+           [HttpDelete("{id}"), Authorize]
+           public IActionResult DeleteId (int id)
+           {
+               var item = db.Areas.FirstOrDefault(x => x.Id == id);
 
-            item.DeletedAt = DateTime.Now;
-            item.code = item.code + "_x_" + DateTime.Now.ToString("ddMMHHmmss");
-            item.Name = item.Name + "_x_" + DateTime.Now.ToString("ddMMyyHHmmss"); //Name la duy nhat
+               item.DeletedAt = DateTime.Now;
+               item.code = item.code + "_x_" + DateTime.Now.ToString("ddMMHHmmss");
+               item.Name = item.Name + "_x_" + DateTime.Now.ToString("ddMMyyHHmmss"); //Name la duy nhat
 
-            db.Areas.Update(item);
-            db.SaveChanges();
+               db.Areas.Update(item);
+               db.SaveChanges();
 
-            return Ok(item);
-        } */
+               return Ok(item);
+           } */
 
     }
 }

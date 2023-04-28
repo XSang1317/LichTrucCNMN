@@ -38,58 +38,111 @@ namespace LichTruc.Controllers.Staff
             public string UpdatedBy { get; set; }
         }
         //Get all
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllStaffs()
+        //{
+        //    var staffs = await db.Staffs
+        //    .Include(s => s.Area)
+        //    .Select(s => new StaffWithAreaDto
+        //    {
+        //        Id = s.Id,
+        //        Name = s.Name,
+        //        Username = s.Username,
+        //        Email = s.Email,
+        //        Phone = s.Phone,
+        //        AreaId = s.areaId,
+        //        AreaName = s.Area.Name
+        //    })
+        //    .ToListAsync();
+
+        //    return Ok(staffs);
+        //}
         [HttpGet]
-        public async Task<IActionResult> GetAllStaffs()
+        public async Task<ActionResult<IEnumerable<Data.Entities.Staff>>> GetStaffs()
         {
-            var staffs = await db.Staffs
-            .Include(s => s.Area)
-            .Select(s => new StaffWithAreaDto
+            var staff = await db.Staffs.Include(s => s.Area).Select(s=> new StaffWithAreaDto
             {
                 Id = s.Id,
                 Name = s.Name,
-                Username = s.Username,
-                Email = s.Email,
                 Phone = s.Phone,
-                AreaId = s.areaId,
-                AreaName = s.Area.Name
-            })
-            .ToListAsync();
-
-            return Ok(staffs);
+                Email = s.Email,
+                Username = s.Username,
+                AreaName =s.Area.Name,
+                AreaId =s.Area.Id,
+                CreatedAt = DateTime.Now,
+                CreatedBy = s.Name
+            }).ToListAsync();
+            return Ok(staff);
         }
-        [HttpPost]
-        public async Task<IActionResult> CreateNewStaff(LichTruc.Data.Entities.Staff staff)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Data.Entities.Staff>> GetStaff(int id)
         {
-            // Lấy thông tin của Area từ database sử dụng LINQ Join khi cần Join nhiều dữ liệu 
-            //var area = await (from s in db.Staffs
-            //                  join a in db.Areas on s.areaId equals a.Id
-            //                  where s.areaId == staff.areaId
-            //                  select new { a.Name }).FirstOrDefaultAsync();
+            var staff = await db.Staffs.Include(s => s.Area).FirstOrDefaultAsync(s => s.Id == id);
 
-            var area = db.Areas.FirstOrDefault(x => x.Id == staff.areaId);
-            // Nếu không tìm thấy Area, trả về BadRequest
-            if (area == null)
+            if (staff == null)
             {
-                return BadRequest($"Cannot find Area with ID {staff.areaId}");
+                return NotFound();
             }
 
-            // Tạo mới đối tượng Staff và gán các thông tin từ DTO và Area
-            var newStaff = new LichTruc.Data.Entities.Staff
-            {
-                Name = staff.Name,
-                areaId = staff.areaId,
-                areaName = area.Name, // Gán AreaName từ thông tin của Area
-                CreatedAt = DateTime.Now,
-                CreatedBy = staff.Name,
-            };
+            return staff;
+        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateNewStaff(LichTruc.Data.Entities.Staff staff)
+        //{
+        //    // Lấy thông tin của Area từ database sử dụng LINQ Join khi cần Join nhiều dữ liệu 
+        //    //var area = await (from s in db.Staffs
+        //    //                  join a in db.Areas on s.areaId equals a.Id
+        //    //                  where s.areaId == staff.areaId
+        //    //                  select new { a.Name }).FirstOrDefaultAsync();
 
-            // Lưu đối tượng Staff vào database
-            db.Staffs.Add(newStaff);
+        //    var area = db.Areas.FirstOrDefault(x => x.Id == staff.areaId);
+        //    // Nếu không tìm thấy Area, trả về BadRequest
+        //    if (area == null)
+        //    {
+        //        return BadRequest($"Cannot find Area with ID {staff.areaId}");
+        //    }
+
+        //    // Tạo mới đối tượng Staff và gán các thông tin từ DTO và Area
+        //    var newStaff = new LichTruc.Data.Entities.Staff
+        //    {
+        //        Name = staff.Name,
+        //        areaId = staff.areaId,
+        //        //areaName = area.Name, // Gán AreaName từ thông tin của Area
+        //        CreatedAt = DateTime.Now,
+        //        CreatedBy = staff.Name,
+        //    };
+
+        //    // Lưu đối tượng Staff vào database
+        //    db.Staffs.Add(newStaff);
+        //    await db.SaveChangesAsync();
+
+        //    // Trả về thông tin của Staff đã được tạo mới
+        //    return Ok(newStaff);
+        //}
+
+
+
+        [HttpPost]
+        public async Task<ActionResult<Data.Entities.Staff>> PostStaff(Data.Entities.Staff staff)
+        {
+            staff.CreatedAt = DateTime.Now;
+            staff.CreatedBy = User.Identity.Name;
+            // Lấy đối tượng Area tương ứng với AreaId
+            var area = await db.Areas.FindAsync(staff.areaId);
+
+            if (area == null)
+            {
+                return BadRequest("Area not found");
+            }
+
+            staff.Area = area;
+
+            db.Staffs.Add(staff);
             await db.SaveChangesAsync();
 
-            // Trả về thông tin của Staff đã được tạo mới
-            return Ok(newStaff);
+            return CreatedAtAction(nameof(GetStaff), new { id = staff.Id }, staff);
         }
+
         //[HttpPost]
         //public async Task<IActionResult> CreateStaff([FromBody] LichTruc.Data.Entities.Staff model)
         //{

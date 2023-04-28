@@ -17,7 +17,7 @@ namespace LichTruc.Controllers.Staff
         {
             this.db = db;
         }
-        [HttpGet,Authorize(Roles ="crud_user")]
+        [HttpGet]
         public IActionResult GetAllStaff(string q) //Get All Staff
         {
             var Query = $"%{q?.ToLower()}%";
@@ -30,7 +30,7 @@ namespace LichTruc.Controllers.Staff
                                       .AsNoTracking().ToList();
             return Ok(staff);
         }
-        [HttpPost, Authorize(Roles = "crud_user")]
+        [HttpPost]
         public IActionResult CreateNewStaff([FromBody] LichTruc.Data.Entities.Staff staff) //Add New Staff
         {
             try
@@ -146,7 +146,7 @@ namespace LichTruc.Controllers.Staff
             public int status { get; set; }
             public int UpdatedBy { get; set; }
         }
-        [HttpPut, Authorize( Roles = "crud_user")]
+        [HttpPut]
         public IActionResult UpdateAccount([FromBody] AccountPayLoad model)
         {
             try
@@ -168,7 +168,7 @@ namespace LichTruc.Controllers.Staff
                     }
                     item.Phone = model.phone;
                     item.UpdatedAt = DateTime.Now;
-                    item.UpdatedBy = model.UpdatedBy;
+                   // item.UpdatedBy = model.UpdatedBy;
 
                     //Image Add
                     //if (!item.signature.Equals(model.signature))
@@ -212,7 +212,7 @@ namespace LichTruc.Controllers.Staff
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("{id}"), Authorize(Roles = "crud_user")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Delete(int id, int UpdatedBy)
         {
             try
@@ -221,7 +221,7 @@ namespace LichTruc.Controllers.Staff
                 if (item != null)
                 {
                     item.DeletedAt = DateTime.Now;
-                    item.UpdatedBy = UpdatedBy;
+                    //item.UpdatedBy = UpdatedBy;
                     await db.SaveChangesAsync();
                 }
                 return Ok();

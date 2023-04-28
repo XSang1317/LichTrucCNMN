@@ -13,7 +13,7 @@ namespace LichTruc.Data.Entities
         public int? parent { get; set; }
         [Required]
         [StringLength(255)]
-        public string name { get; set; } = "";
+        public string name { get; set; }
 
         //
         [Column(TypeName = "smalldatetime")]
@@ -24,6 +24,6 @@ namespace LichTruc.Data.Entities
 
         public Boolean hasPermission { get; set; }
 
-        public IList<Permission>? Permissions { get; set; }
+        public IList<Permission> Permissions { get; set; }
     }
 }

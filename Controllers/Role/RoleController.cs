@@ -15,8 +15,8 @@ namespace LichTruc.Controllers.Role
         {
             this.db = db;
         }
-        [HttpGet]
 
+        [HttpGet]
         public IActionResult GetRoles()
         {
             var roles = db.Roles.ToList();
@@ -56,7 +56,7 @@ namespace LichTruc.Controllers.Role
                 var item = db.Roles.FirstOrDefault(i => i.name == model.name);
                 if (item != null)
                     return BadRequest("Group name already exists");
-                item = new LichTruc.Data.Entities.Role()
+                item = new Data.Entities.Role()
                 {
                     name = model.name,
                     CreatedAt = DateTime.Now,
@@ -111,45 +111,56 @@ namespace LichTruc.Controllers.Role
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Delete(int id, int UpdatedBy)
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Delete(int id, int UpdatedBy)
+        //{
+        //    try
+        //    {
+        //        var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
+        //        if (item != null)
+        //        {
+        //            item.DeletedAt = DateTime.Now;
+        //            item.UpdatedBy = UpdatedBy;
+        //            await db.SaveChangesAsync();
+        //        }
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRole(int id)
         {
-            try
-            {
-                var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
-                if (item != null)
-                {
-                    item.DeletedAt = DateTime.Now;
-                    item.UpdatedBy = UpdatedBy;
-                    await db.SaveChangesAsync();
-                }
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var roleToDelete = db.Roles.Find(id);
+            if (roleToDelete == null)
+                return NotFound();
+            db.Roles.Remove(roleToDelete);
+            db.SaveChanges();
+            return NoContent();
         }
-        [HttpDelete]
-        [Route("{id?}/staff/{staffid?}")]
-        public async Task<IActionResult> DeleteeStaffInRole (int id, int staffid)
-        {
-            try
-            {
-                var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
-                foreach (var staffHasRole in item.StaffHasRoles)
-                {
-                    if (staffHasRole.staffId == staffid)
-                        db.Entry(staffHasRole).State = EntityState.Deleted;
-                }
-                await db.SaveChangesAsync();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+
+        //[HttpDelete]
+        //[Route("{id?}/staff/{staffid?}")]
+        //public async Task<IActionResult> DeleteeStaffInRole (int id, int staffid)
+        //{
+        //    try
+        //    {
+        //        var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
+        //        foreach (var staffHasRole in item.StaffHasRoles)
+        //        {
+        //            if (staffHasRole.staffId == staffid)
+        //                db.Entry(staffHasRole).State = EntityState.Deleted;
+        //        }
+        //        await db.SaveChangesAsync();
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
         /*
          * Quản lý permission trong role 
          * - Hàm get permission 

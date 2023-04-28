@@ -29,34 +29,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration
            .GetConnectionString("DefaultConnection"), 
            sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//    .AddJwtBearer(options =>
-//    {
-//        options.RequireHttpsMetadata = false;
-//        options.SaveToken = true;
-//        options.ClaimsIssuer = builder.Configuration["Jwt:Issuer"];
-
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-
-//            ValidateAudience = true,
-//            ValidAudience = builder.Configuration["Jwt:Audience"],
-
-//            ValidateIssuerSigningKey = true,
-//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-
-//            RequireExpirationTime = true,
-//            ValidateLifetime = true,
-//            ClockSkew = TimeSpan.Zero
-//        };
-//    });
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -73,7 +45,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+});
+//app.MapPost(
+//    pattern:"/createArea",handler: async([FromBody] AuthRequest authRequest, IAuthService authService) ={
+//    var response = await AuthenticationServiceCollectionExtensions.SendMagiclink(authRequest.Email)
+//})
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

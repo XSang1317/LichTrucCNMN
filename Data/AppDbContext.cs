@@ -54,9 +54,9 @@ namespace LichTruc.Data
             modelBuilder.Entity<PickList>().Property(sc => sc.Used).HasDefaultValue(true);
 
             modelBuilder.Entity<Staff>()
-            .HasOne<Area>(a => a.Area)
-            .WithMany(s => s.Staff)
-            .HasForeignKey(a => a.Id);
+            .HasOne(s => s.Area)
+            .WithMany(a => a.Staff)
+            .HasForeignKey(s => s.areaId);
 
             modelBuilder.Entity<Shifts>()
             .HasOne<Staff>(a => a.Staff)

@@ -45,6 +45,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import PopMenu from "./PopMenu.vue";
 export default defineComponent({
   components: {
     PopMenu,

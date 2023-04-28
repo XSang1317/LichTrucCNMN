@@ -7,6 +7,7 @@
 
 <script>
 import CalenderVue from '../pages/calender/Calender.vue';
+import NavMenuVue from './NavMenu.vue';
 export default {
   name: 'Home',
   components:{

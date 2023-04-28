@@ -253,14 +253,14 @@ export default defineComponent({
       email: "",
       password: "",
       password_confirmation: "",
-      area_name: [],
+      department_id: [],
       status_id: []
     });
 
     const errors = ref({});
 
     const getUsersCreate = () => {
-      axios.get("/api/staff/createnewstaff")
+      axios.get("api/staff/create")
       .then((response) => {
         users_status.value = response.data.users_status;
         departments.value = response.data.departments;
@@ -275,7 +275,7 @@ export default defineComponent({
     };
 
     const createUsers = () => {
-      axios.post("/api/staff", users)
+      axios.post("api/staff", users)
       .then((response) => {
         if(response.status == 200) {
           message.success("Tạo mới thành công!");

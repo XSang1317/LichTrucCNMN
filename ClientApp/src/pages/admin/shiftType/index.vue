@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="Shift Types">
+    <a-card title="Loại ca">
       <a-table :columns="columns" :dataSource="shiftTypes">
         <template #timeStart="{ text }">
           {{ text | formatTime }}
@@ -105,24 +105,24 @@ export default {
         key: "index",
       },
       {
-        title: "Name",
+        title: "Loại ca",
         dataIndex: "name",
         key: "name",
       },
       {
-        title: "Time Start",
+        title: "Thời gian bắt đầu",
         dataIndex: "timeStart",
         key: "timeStart",
         slots: { customRender: "timeStart" },
       },
       {
-        title: "Time End",
+        title: "Thời gian kết thúc",
         dataIndex: "timeEnd",
         key: "timeEnd",
         slots: { customRender: "timeEnd" },
       },
       {
-        title: "Action",
+        title: "Công cụ",
         key: "action",
         slots: { customRender: "customRender" },
       },

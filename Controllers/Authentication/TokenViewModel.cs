@@ -16,12 +16,12 @@ namespace LichTruc.Controllers.Authentication
         public IEnumerable<string> Permissions { get; set; }
         public int AccountId { get; set; }
         public string Name { get; set; }
-        public string FullName { get; set; }
+        public string Username { get; set; }
         public int Status { get; set; }
 
 
         //public IEnumerable<Department> Departments { get; set; }
 
-        public int DepartmentId { get; set; }
+        public int AreaId { get; set; }
     }
 }

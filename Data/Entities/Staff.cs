@@ -11,26 +11,37 @@ namespace LichTruc.Data.Entities
     {
         [Key]
         public int Id { get; set; }
-        //[Required]
-        [StringLength(50)]
-        public string Name { get; set; }
-        //[Required]
-        [StringLength(50)]
-        public string Username { get; set; }
-        public string Email { get; set; } 
-        public string signature { get; set; }
-        public string Phone { get; set; } 
-        public string Note { get; set; } 
-        public int status { get; set; } = 1;
-        public string? RefreshToken { get; set; }
-        [StringLength(255)]
-        public string salt { get; set; } 
 
+        public string Name { get; set; } 
+
+        public string Username { get; set; } = "";
+
+        public string Email { get; set; } = "";
+
+        public string signature { get; set; } = "";
+
+        public string Phone { get; set; } = "";
+
+        public string Note { get; set; } = "";
+
+        public int status { get; set; } = 1;
+
+        public string? RefreshToken { get; set; }
+
+        //[Required]
+        [StringLength(255)]
+        public string? salt { get; set; }
+
+        //[Required]
         [StringLength(255)]
         public string password { get; set; } 
-        public int areaId { get; set; }       
-        public string areaName { get; set; }
-        public virtual Area Area { get; set; } //FK to Area
+
+        public int? areaId { get; set; }
+        //public int? roleId { get; set; }
+        public string? areaName { get; set; } // Thêm trường AreaName
+        //public string RoleName { get; set; } // Thêm trường RoleName
+
+        public Area Area { get; set; } //FK to Area
         public virtual ICollection<Shifts>? Shifts { get; set; } //Thuoc tinh dieu huong
 
 
@@ -49,6 +60,7 @@ namespace LichTruc.Data.Entities
 
         //Link FK
         public IList<StaffHasRole>? StaffHasRoles { get; set; }
+        public IList<StaffHasArea>? StaffHasAreas { get; set; }
         public IList<StaffHasPermission>? StaffHasPermissions { get; set; }
 
 

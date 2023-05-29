@@ -6,237 +6,213 @@ using LichTruc.Data;
 using LichTruc.Data.Entities;
 using LichTruc.Utils;
 using static LichTruc.Controllers.Areas.AreaController;
+using Microsoft.EntityFrameworkCore.Storage;
 //using LichTruc.Interfaces;
 
 namespace LichTruc.Controllers.Staff
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class StaffController : ControllerBase
     {
-        private readonly AppDbContext db = null ;
-       // private readonly IAreaController _areaController; ///Call AreaName to table Area
+        private readonly AppDbContext _context;
 
-        public StaffController(AppDbContext db)
+        public StaffController(AppDbContext context)
         {
-            this.db = db;
-           // _areaController = areaController;
+            _context = context;
         }
-        public class StaffWithAreaDto
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public string Phone { get; set; }
-            public string Email { get; set; }
-            public string Username { get; set; }
-            public int AreaId { get; set; }
-            public string AreaName { get; set; }
-            public DateTime CreatedAt { get; set; }
-            public DateTime UpdateAt { get; set; }
-            public DateTime DeleteAt { get; set; }
-            public string CreatedBy { get; set; }
-            public string UpdatedBy { get; set; }
-        }
-        //Get all
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllStaffs()
-        //{
-        //    var staffs = await db.Staffs
-        //    .Include(s => s.Area)
-        //    .Select(s => new StaffWithAreaDto
-        //    {
-        //        Id = s.Id,
-        //        Name = s.Name,
-        //        Username = s.Username,
-        //        Email = s.Email,
-        //        Phone = s.Phone,
-        //        AreaId = s.areaId,
-        //        AreaName = s.Area.Name
-        //    })
-        //    .ToListAsync();
 
-        //    return Ok(staffs);
-        //}
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Data.Entities.Staff>>> GetStaffs()
+        // Lấy danh sách Staff
+        public async Task<List<Data.Entities.Staff>> GetStaffListAsync()
         {
-            var staff = await db.Staffs.Include(s => s.Area).Select(s=> new StaffWithAreaDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Phone = s.Phone,
-                Email = s.Email,
-                Username = s.Username,
-                AreaName =s.Area.Name,
-                AreaId =s.Area.Id,
-                CreatedAt = DateTime.Now,
-                CreatedBy = s.Name
-            }).ToListAsync();
-            return Ok(staff);
-        }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Data.Entities.Staff>> GetStaff(int id)
-        {
-            var staff = await db.Staffs.Include(s => s.Area).FirstOrDefaultAsync(s => s.Id == id);
+            var query = from s in _context.Staffs
+                        join a in _context.Areas on s.areaId equals a.Id into areaJoin
+                        from area in areaJoin.DefaultIfEmpty()
+                            //join r in db.Roles on s.roleId equals r.id into roleJoin
+                            //from role in roleJoin.DefaultIfEmpty()
+                        select new Data.Entities.Staff
+                        {
+                            Id = s.Id,
+                            Name = s.Name,
+                            Username = s.Username,
+                            Email = s.Email,
+                            password = s.password,
+                            Phone = s.Phone,
+                            areaId = s.areaId,
+                            //  roleId = s.roleId,
+                            CreatedAt = s.CreatedAt,
+                            UpdatedAt = s.UpdatedAt,
+                            DeletedAt = s.DeletedAt,
+                            areaName = area.Name, // Lấy dữ liệu AreaName
+                                                  //    RoleName = role.name // Lấy dữ liệu RoleName
+                        };
 
+            return await query.ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStaff(int id)
+        {
+            var staff = await _context.Staffs.FindAsync(id);
             if (staff == null)
             {
                 return NotFound();
             }
-
-            return staff;
+            return Ok(staff);
         }
-        //[HttpPost]
-        //public async Task<IActionResult> CreateNewStaff(LichTruc.Data.Entities.Staff staff)
+        //public class StaffDto
         //{
-        //    // Lấy thông tin của Area từ database sử dụng LINQ Join khi cần Join nhiều dữ liệu 
-        //    //var area = await (from s in db.Staffs
-        //    //                  join a in db.Areas on s.areaId equals a.Id
-        //    //                  where s.areaId == staff.areaId
-        //    //                  select new { a.Name }).FirstOrDefaultAsync();
-
-        //    var area = db.Areas.FirstOrDefault(x => x.Id == staff.areaId);
-        //    // Nếu không tìm thấy Area, trả về BadRequest
-        //    if (area == null)
-        //    {
-        //        return BadRequest($"Cannot find Area with ID {staff.areaId}");
-        //    }
-
-        //    // Tạo mới đối tượng Staff và gán các thông tin từ DTO và Area
-        //    var newStaff = new LichTruc.Data.Entities.Staff
-        //    {
-        //        Name = staff.Name,
-        //        areaId = staff.areaId,
-        //        //areaName = area.Name, // Gán AreaName từ thông tin của Area
-        //        CreatedAt = DateTime.Now,
-        //        CreatedBy = staff.Name,
-        //    };
-
-        //    // Lưu đối tượng Staff vào database
-        //    db.Staffs.Add(newStaff);
-        //    await db.SaveChangesAsync();
-
-        //    // Trả về thông tin của Staff đã được tạo mới
-        //    return Ok(newStaff);
+        //    public int Id { get; set; }
+        //    public string Name { get; set; }
+        //    public string Username { get; set; }
+        //    public string Email { get; set; }
+        //    public string Phone { get; set; }
+        //    public string password { get; set; }
+        //    public DateTime CreatedAt { get; set; }
+        //    public DateTime UpdatedAt { get; set; }
+        //    public int AreaId { get; set; }
+        //    public string? AreaName { get; set; }
+        //    public AreaDto? AreaDto { get; set; }
         //}
 
+        //public class AreaDto
+        //{
+        //    public int Id { get; set; }
+        //    public string Name { get; set; }
+        //    public string Description { get; set; }
+        //    public string? Code { get; set; }
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> CreateStaff(Data.Entities.Staff staff)
+        //{
+        //    try
+        //    {
+        //        var check_exist = _context.Staffs.FirstOrDefault(x => x.Username == staff.Username && x.DeletedAt == null);
+        //        if (check_exist != null)
+        //        {
+        //            return BadRequest("Tài khoản đã tồn tại !");
+        //        }
+        //        var area = await _context.Areas.FirstOrDefaultAsync(a => a.Name == staff.areaName && a.DeletedAt == null);
+        //        if (area == null)
+        //        {
+        //            return BadRequest("Invalid areaName");
+        //        }
+        //        var passwordHash = AuthUtils.hashPassword(staff.password);
+        //        var currentPath = Directory.GetCurrentDirectory();
 
+        //        staff.Username = staff.Username.ToLower();
+        //        staff.salt = passwordHash.salt;
+        //        staff.password = passwordHash.hashed;
+        //        staff.CreatedAt = DateTime.Now;
+        //        staff.areaName = area.Name;
+        //        staff.areaId = area.Id; // Lấy mã ID của khu vực tương ứng
+        //        _context.Staffs.Add(staff);
+        //        await _context.SaveChangesAsync();
 
+        //        return CreatedAtAction(nameof(GetStaff), new { id = staff.Id }, staff);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
         [HttpPost]
-        public async Task<ActionResult<Data.Entities.Staff>> PostStaff(Data.Entities.Staff staff)
+        public async Task<IActionResult> CreateStaff([FromBody] StaffViewModel model)
         {
-            staff.CreatedAt = DateTime.Now;
-            staff.CreatedBy = User.Identity.Name;
-            // Lấy đối tượng Area tương ứng với AreaId
-            var area = await db.Areas.FindAsync(staff.areaId);
-
+            // Kiểm tra xem Id của phòng ban có hợp lệ hay không
+            var area = await _context.Areas.FindAsync(model.AreaId);
             if (area == null)
             {
-                return BadRequest("Area not found");
+                return BadRequest("Phòng ban không hợp lệ");
             }
+            var passwordHash = AuthUtils.hashPassword(model.Password);
+            // Tạo một bản ghi mới trong bảng Staffs
+            var staff = new Data.Entities.Staff
+            {
 
-            staff.Area = area;
+                Name = model.Name,
+                Username = model.UserName,
+                Email = model.Email,
+                Phone = model.Phone,
+                salt = passwordHash.salt,
+                password = passwordHash.hashed,
+                areaId = model.AreaId,
+                CreatedAt = DateTime.Now,
+                CreatedBy = User.Identity.Name
+            };
 
-            db.Staffs.Add(staff);
-            await db.SaveChangesAsync();
+            _context.Staffs.Add(staff);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetStaff), new { id = staff.Id }, staff);
+            return Ok("Thêm nhân viên mới thành công");
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateStaff([FromBody] LichTruc.Data.Entities.Staff model)
-        //{
-        //    var staff = new LichTruc.Data.Entities.Staff
+        public class StaffViewModel
+        {
+            public string Name { get; set; }
+            public string UserName { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public string Password { get; set; }
+            public int AreaId { get; set; }
+        }
+        //    [HttpPost]
+        //    public async Task<ActionResult<Data.Entities.Staff>> CreateStaff(CreateStaffRequest request)
         //    {
-        //        Name = model.Name,
-        //        Username = model.Username,
-        //        Email = model.Email,
-        //        password = model.password,
-        //        Phone = model.Phone,
-        //        //RefreshToken = model.RefreshToken,
-        //        salt = model.salt,
-        //        CreatedAt = DateTime.UtcNow,
-        //        CreatedBy = "1",
-        //        areaId = model.areaId
-        //    };
+        //        var staff = new Data.Entities.Staff
+        //        {
+        //            Name = request.Name,
+        //            areaId = request.AreaId
+        //        };
+        //        _context.Staffs.Add(staff);
+        //        await _context.SaveChangesAsync();
 
-        //    await db.Staffs.AddAsync(staff);
-        //    await db.SaveChangesAsync();
+        //        return staff;
+        //    }
 
-        //    return Ok();
+        //public class CreateStaffRequest
+        //{
+        //    public string Name { get; set; }
+        //    public int AreaId { get; set; }
         //}
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStaff(int id, LichTruc.Data.Entities.Staff staff)
+        public async Task<IActionResult> UpdateStaff(int id, Data.Entities.Staff staff)
         {
             if (id != staff.Id)
             {
                 return BadRequest();
             }
+            var passwordHash = AuthUtils.hashPassword(staff.password);
 
-            db.Entry(staff).State = EntityState.Modified;
+            var area = await _context.Areas.FindAsync(staff.areaId);
+            if (area == null)
+            {
+                return BadRequest("Invalid areaId");
+            }
+            staff.salt = passwordHash.salt;
+            staff.password = passwordHash.hashed;
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StaffExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            staff.areaName = area.Name;
+            _context.Entry(staff).State = EntityState.Modified;
+            staff.UpdatedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStaff(int id, [FromBody] LichTruc.Data.Entities.Staff model)
-        {
-            var staff = await db.Staffs.FindAsync(id);
-            if (staff == null)
-            {
-                return NotFound();
-            }
 
-            staff.Name = model.Name;
-            staff.Username = model.Username;
-            staff.Email = model.Email;
-            staff.password = model.password;
-            staff.Phone = model.Phone;
-            staff.RefreshToken = model.RefreshToken;
-            staff.salt = model.salt;
-            staff.UpdatedAt = DateTime.UtcNow;
-            staff.UpdatedBy = "admin";
-            staff.areaId = model.areaId;
-
-            await db.SaveChangesAsync();
-
-            return Ok();
-        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStaff(int id)
         {
-            var staff = await db.Staffs.FindAsync(id);
+            var staff = await _context.Staffs.FindAsync(id);
             if (staff == null)
             {
                 return NotFound();
             }
 
-            db.Staffs.Remove(staff);
-            await db.SaveChangesAsync();
+            _context.Staffs.Remove(staff);
+            await _context.SaveChangesAsync();
 
-            return Ok();
-        }
-
-
-        private bool StaffExists(int id)
-        {
-            return db.Staffs.Any(e => e.Id == id);
+            return NoContent();
         }
     }
 }

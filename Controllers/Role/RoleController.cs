@@ -17,36 +17,74 @@ namespace LichTruc.Controllers.Role
         }
 
         [HttpGet]
-        public IActionResult GetRoles()
+        //public IActionResult GetRoles()
+        //{
+        //    var roles = db.Roles.ToList();
+        //    return Ok(roles);
+        //}
+        [HttpGet]
+        public async Task<IActionResult> GetRoles()
         {
-            var roles = db.Roles.ToList();
-            return Ok(roles);
+            var roles = await db.Roles.ToListAsync();
+            var rolesModel = roles.Select(a => new LichTruc.Data.Entities.Role
+            {
+                id = a.id,
+                name = a.name,
+                CreatedAt = a.CreatedAt,
+                UpdatedAt = a.UpdatedAt,
+                DeletedAt = a.DeletedAt,
+                CreatedBy = a.CreatedBy,
+                UpdatedBy = a.UpdatedBy
+            }).ToList();
 
-  /*       public async Task<IActionResult> Index(string q)
+            return Ok(rolesModel);
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetRoles(string q)
+        //{
+        //    var query = $"%{q?.ToLower()}%";
+
+        //    var items = await db.Roles
+        //        .Where(x => string.IsNullOrEmpty(q) || EF.Functions.Like(x.Name.ToLower(), query))
+        //        .Select(x => new { x.Id, x.Name })
+        //        .OrderBy(x => x.Name)
+        //        .ToListAsync();
+
+        //    return Ok(new { items });
+        //}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetRoleById(int id)
         {
-            var Query = $"%{q?.ToLower()}%";
+            var role = await db.Roles.FindAsync(id);
+            if (role == null)
+            {
+                return NotFound();
+            }
 
-            var items = db.Roles.Where(x => string.IsNullOrEmpty(q) || (EF.Functions.Like(x.name.ToLower(), Query)))
-                                .Select(x=> new {x.id, x.name}).OrderBy(x=>x.name).ToList();
-            return Ok(new {items}); */
-
+            return Ok(new { role });
         }
         [HttpGet]
         [Route("{id?}/staff")]
-        public async Task<IActionResult> GetStaffByRole(int? id, string staffSearchQuery)
+        public async Task<IActionResult> GetUserByRole(int? id, string userSearchQuery)
         {
             try
             {
-                var Query = $"%{staffSearchQuery?.ToLower()}%";
+                var Query = $"%{userSearchQuery?.ToLower()}%";
+
                 var role = db.Roles.Include(x => x.StaffHasRoles).ThenInclude(x => x.Staff).FirstOrDefault(x => x.id == id);
+                //var items = role.UserRoles.Select(x => x.User).ToList;
                 var items = role.StaffHasRoles
-                                .Where(x => string.IsNullOrEmpty(staffSearchQuery) || (EF.Functions.Like(x.Staff.Username.ToLower(), Query))
+                    .Where(x => string.IsNullOrEmpty(userSearchQuery) || (EF.Functions.Like(x.Staff.Username.ToLower(), Query))
                                                                     || (EF.Functions.Like(x.Staff.Name.ToLower(), Query)
                                                                     || (EF.Functions.Like(x.Staff.Email.ToLower(), Query))))
-                                .Select(x => new { x.Staff.Id, x.Staff.Username, x.Staff.Email, x.Staff.Name }).ToList();
-                return Ok(new {items});
+                    .Select(x => new { x.Staff.Id, x.Staff.Username, x.Staff.Email, x.Staff.Name }).ToList();
+                return Ok(new { items });
             }
-            catch(Exception ex) { return BadRequest(ex.Message); }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPost]
         public async Task<IActionResult> Store([FromBody] StoreRoleViewModel model)
@@ -55,7 +93,7 @@ namespace LichTruc.Controllers.Role
             {
                 var item = db.Roles.FirstOrDefault(i => i.name == model.name);
                 if (item != null)
-                    return BadRequest("Group name already exists");
+                    return BadRequest("Quyền đã tồn tại !");
                 item = new Data.Entities.Role()
                 {
                     name = model.name,
@@ -84,13 +122,14 @@ namespace LichTruc.Controllers.Role
                     db.Add(staff_role);
                     await db.SaveChangesAsync();
                 }
-                return Ok(new { item = new { staff.Email, staff.Username, staff.Name } });
+                return Ok(new { item = new { staff.Email, staff.Username, staff.Id, staff.Name } });
             }
             catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateRoleViewModel model)
         {
@@ -111,25 +150,26 @@ namespace LichTruc.Controllers.Role
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Delete(int id, int UpdatedBy)
-        //{
-        //    try
-        //    {
-        //        var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
-        //        if (item != null)
-        //        {
-        //            item.DeletedAt = DateTime.Now;
-        //            item.UpdatedBy = UpdatedBy;
-        //            await db.SaveChangesAsync();
-        //        }
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Delete(int id, int UpdatedBy)
+        {
+            try
+            {
+                var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
+                if (item != null)
+                {
+                    item.DeletedAt = DateTime.Now;
+                    item.UpdatedBy = UpdatedBy;
+                    //db.Roles.Remove(item);
+                    await db.SaveChangesAsync();
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpDelete("{id}")]
         public IActionResult DeleteRole(int id)
         {
@@ -140,65 +180,65 @@ namespace LichTruc.Controllers.Role
             db.SaveChanges();
             return NoContent();
         }
-
-        //[HttpDelete]
-        //[Route("{id?}/staff/{staffid?}")]
-        //public async Task<IActionResult> DeleteeStaffInRole (int id, int staffid)
-        //{
-        //    try
-        //    {
-        //        var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
-        //        foreach (var staffHasRole in item.StaffHasRoles)
-        //        {
-        //            if (staffHasRole.staffId == staffid)
-        //                db.Entry(staffHasRole).State = EntityState.Deleted;
-        //        }
-        //        await db.SaveChangesAsync();
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpDelete]
+        [Route("{id?}/staff/{staffid?}")]
+        public async Task<IActionResult> DeleteUserInRole(int id, int staffId)
+        {
+            try
+            {
+                var item = db.Roles.Include(x => x.StaffHasRoles).FirstOrDefault(i => i.id == id);
+                foreach (var staffHasRole in item.StaffHasRoles)
+                {
+                    if (staffHasRole.staffId == staffId)
+                        db.Entry(staffHasRole).State = EntityState.Deleted;
+                }
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         /*
-         * Quản lý permission trong role 
-         * - Hàm get permission 
-         * - Hàm update permission
-         */
+          * Quản lý permission trong role
+          * - Hàm get permission
+          * - Hàm cập nhật permission
+          */
         [HttpGet]
         [Route("{id?}/permission")]
         public async Task<IActionResult> GetPermissionByRole(int? id)
         {
             try
             {
-                //Get permission in role
+                //Get permission trong role
                 var rolePermissions = await db.RoleHasPermissions.Where(x => x.roleId == id).ToListAsync();
-                //Get all Permission
+                //Get tất cả permission
                 var items = await db.Permissions.Select(x => new RolePermissionViewModel() { Id = x.id, Name = x.name, HasPermission = false, PermissionGroupId = x.PermissionGroupId })
                                                 .OrderBy(x => x.Name).ToListAsync();
-                //TurnOn Value true if permission in role
-                foreach(var item in items)
+                //Bật giá trị true nếu permission đó có trong role
+                foreach (var item in items)
                 {
-                    if(rolePermissions.FirstOrDefault(x=> x.PermissionId == item.Id) != null)
+                    if (rolePermissions.FirstOrDefault(x => x.PermissionId == item.Id) != null)
                     {
                         item.HasPermission = true;
                     }
                 }
                 return Ok(new { items });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message);  
+                return BadRequest(ex.Message);
             }
         }
+
         [HttpPut]
         [Route("{id?}/permission")]
         public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermissionViewModel model)
         {
             try
             {
-                if (model.hasPermission) //Add Permission
+                if (model.hasPermission)    //Thêm permission
                 {
                     var rolePermission = db.RoleHasPermissions.Where(x => x.roleId == id && x.PermissionId == model.id).FirstOrDefault();
                     if (rolePermission == null)
@@ -206,16 +246,16 @@ namespace LichTruc.Controllers.Role
                         rolePermission = new RoleHasPermission()
                         {
                             PermissionId = model.id,
-                            roleId = id,
+                            roleId = id
                         };
                         db.RoleHasPermissions.Add(rolePermission);
                         await db.SaveChangesAsync();
                     }
                 }
-                else
+                else //Xóa permission
                 {
                     var rolePermission = db.RoleHasPermissions.Where(x => x.roleId == id && x.PermissionId == model.id).FirstOrDefault();
-                    if(rolePermission != null)
+                    if (rolePermission != null)
                     {
                         db.RoleHasPermissions.Remove(rolePermission);
                         await db.SaveChangesAsync();
@@ -223,9 +263,9 @@ namespace LichTruc.Controllers.Role
                 }
                 return Ok();
             }
-            catch(Exception ex) 
-            { 
-                return BadRequest(ex.Message); 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

@@ -12,10 +12,10 @@ namespace LichTruc.Data.Entities
         public int id { get; set; }
         //[Required]
         [StringLength(255)]
-        public string? code { get; set; }
+        public string code { get; set; }
         //[Required]
         [StringLength(255)]
-        public string? name { get; set; }
+        public string name { get; set; }
         //[Required]
         [StringLength(255)]
         public string? description { get; set; }
@@ -32,7 +32,7 @@ namespace LichTruc.Data.Entities
 
         public PermissionGroup PermissionGroup { get; set; }
 
-        //
+        //Link
         public IList<RoleHasPermission>? RoleHasPermissions { get; set; }
     }
 }

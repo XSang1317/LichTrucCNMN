@@ -28,8 +28,11 @@ namespace LichTruc.Data.Entities
 
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
+
+        public ICollection<StaffHasArea> StaffHasAreas { get; set; }
         //Foreign Key
         public ICollection<Staff>? Staff { get; set; }
+
         public virtual ICollection<Shifts>? Shifts { get; set; }
 
     }

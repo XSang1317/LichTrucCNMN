@@ -23,6 +23,7 @@ namespace LichTruc.Data.Entities
         public DateTime? UpdatedAt { get; set; }
 
         public Boolean hasPermission { get; set; }
+        //public IList<Role> Roles { get; set; }
 
         public IList<Permission> Permissions { get; set; }
     }

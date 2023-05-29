@@ -3,92 +3,117 @@
     <h4 class="title text-center w-100 font-weight-bold">Quản lý lịch trực</h4>
   </div>
   <div class="d-flex flex-column">
-    <form @submit.prevent="login" class="p-1">
-      <a-form class="form-group" label="Username">
-        <a-input v-model="Username" />
-      </a-form>
-      <a-form class="form-group" label="Password">
-        <a-input v-model="password" type="password" />
-      </a-form>
+    <a-form :model="form" @submit.prevent="login" class="p-1">
+      <a-form-item
+        label="Username"
+        name="account"
+        :rules="[{ required: true, message: 'Please input your username' }]"
+      >
+        <a-input v-model.trim="form.account" />
+      </a-form-item>
+      <a-form-item
+        label="Password"
+        name="password"
+        :rules="[{ required: true, message: 'Please input your password' }]"
+      >
+        <a-input v-model.trim="form.password" type="password" />
+      </a-form-item>
 
-      <a-form>
+      <a-form-item>
         <a-button
           class="btn btn-info btn-block btn-round"
-          pill
-          type="primary"
-          :disabled="loading"
+          :loading="loading"
+          html-type="submit"
           >Login</a-button
         >
-        <!-- style="float: left; margin-left: 180px"> -->
-        <!-- <b-button variant="default" @click="close" :disabled="loading">Thoát</b-button> -->
         <a-alert
-          message="Error"
+          class="error"
           type="error"
-          show-icon
-          dismissible
-          @dismissed="error = null"
+          :show-icon="true"
+          :show="error !== null"
+          :closable="true"
+          @close="error = null"
           >{{ error }}</a-alert
         >
-      </a-form>
-    </form>
+      </a-form-item>
+    </a-form>
   </div>
-
 </template>
 
 <script>
-import axios from "axios";
+import { ref } from "vue";
+import { Form, Input, Button, Alert } from "ant-design-vue";
+
 export default {
-  name: "auth-modal",
-  prop: {
-    show: { type: Boolean, required: true },
+  components: {
+    "a-form": Form,
+    "a-form-item": Form.Item,
+    "a-input": Input,
+    "a-button": Button,
+    "a-alert": Alert,
   },
-  data() {
-    return {
-      Username: "",
-      email: "",
+  setup() {
+    const loading = ref(false);
+    const form = ref({
+      account: "",
       password: "",
-      error: null,
-      loading: false,
-    };
-  },
-  methods: {
-    login() {
-      this.loading = true;
-      const payload = {
+    });
+    const error = ref(null);
 
-        username: this.Username,
-        password: this.password,
-      };
-      axios
-        .post("/api/authetication/Staffs", payload)
-
-        .then((response) => {
-          const auth = response.data;
-          this.$log(auth.status);
-          this.$log(response.data);
-          this.$log(response);
-          axios.defaults.headers.common["Authorization"] = `Bearer ${auth.accessToken}`;
-          this.$store.commit("loginSuccess", auth);
-          this.error = null;
-
-          this.Username = "";
-
-          this.email = "";
-          this.password = "";
-          this.loading = false;
-
-          if (this.$route.query.redirect) {
-            this.$route.push(this.$route.query.redirect);
-          } else {
-            this.$route.push("/");
+    const login = () => {
+      form.value.$validate(async (valid) => {
+        if (valid) {
+          loading.value = true;
+          try {
+            // Gọi API để xác thực tài khoản và mật khẩu
+            const response = await fetch("/api/authentication/staff", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                account: form.value.account,
+                password: form.value.password,
+              }),
+            });
+            const data = await response.json();
+            if (data.success) {
+              // Nếu xác thực thành công, chuyển hướng đến trang chính
+              window.location.href = "/admin";
+            } else {
+              // Nếu xác thực thất bại, hiển thị thông báo lỗi
+              error.value = data.message;
+            }
+          } catch (err) {
+            // Xử lý lỗi nếu có
+            console.error(err);
+            error.value = "An error occurred. Please try again later.";
+          } finally {
+            loading.value = false;
           }
-        })
-        .catch((error) => {
-          this.loading = false;
-          delete axios.defaults.headers.common["Authorization"];
-          this.error = error.response.data;
-        });
-    },
+        }
+      });
+    };
+
+    return {
+      loading,
+      form,
+      error,
+      login,
+    };
   },
 };
 </script>
+<style scoped>
+.login-form {
+  max-width: 300px;
+  margin: auto;
+  padding-top: 50px;
+}
+
+.login-form-forgot {
+  float: right;
+}
+
+.login-form-button {
+  width: 100%;
+}
+</style>

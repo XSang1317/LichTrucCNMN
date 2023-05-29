@@ -1,80 +1,52 @@
 <template>
-  <div id="wrapper">
-    <div class="content-wrapper">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-3">
-            <a-table
-              :columns="columns"
-              :data-source="items"
-              :row-key="'id'"
-              row-selection="{type: 'radio', onChange: onRowSelected}"
-            >
-              <template #selected="{ selected }">
-                <div class="text-center">
-                  <template v-if="selected">
-                    <span aria-hidden="true">&check;</span>
-                    <span class="sr-only">Selected</span>
-                  </template>
-                  <template v-else>
-                    <span aria-hidden="true">&nbsp;</span>
-                    <span class="sr-only">Not selected</span>
-                  </template>
-                </div>
-              </template>
-            </a-table>
-          </div>
-          <div class="col-5">
-            <a-table
-              :columns="permissionGroupColumns"
-              :data-source="permission_groups"
-              :row-key="'id'"
-              row-selection="{type: 'radio', onChange: onPermissionGroupRowSelected}"
-            >
-              <template #selected="{ selected }">
-                <div class="text-center">
-                  <template v-if="selected">
-                    <span aria-hidden="true">&check;</span>
-                    <span class="sr-only">Selected</span>
-                  </template>
-                  <template v-else>
-                    <span aria-hidden="true">&nbsp;</span>
-                    <span class="sr-only">Not selected</span>
-                  </template>
-                </div>
-              </template>
-            </a-table>
-          </div>
-          <div class="col-4">
-            <a-table
-              :columns="permissionColumns"
-              :data-source="permissionsByGroup"
-              :row-key="'id'"
-            >
-              <template #hasPermission="{ record }">
-                <div class="text-center">
-                  <a-checkbox
-                    v-model="record.hasPermission"
-                    @change="updatePermissionInRole(record)"
-                  />
-                </div>
-              </template>
-            </a-table>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="content-wrapper">
+    <a-row :gutter="16">
+      <a-col :span="8">
+        <a-table
+          :columns="columns"
+          :data-source="items"
+          :row-key="(record) => record.id"
+          :row-selection="{ type: 'radio', onRowSelected }"
+          :loading="isLoading"
+        />
+      </a-col>
+      <a-col :span="8">
+        <a-table
+          :columns="permissionGroupColumns"
+          :data-source="permission_groups"
+          :row-key="(record) => record.id"
+          :row-selection="{
+            type: 'radio',
+            onPermissionGroupRowSelected,
+          }"
+          :loading="isLoading"
+        />
+      </a-col>
+      <a-col :span="8">
+        <a-table
+          :columns="permissionColumns"
+          :data-source="permissionByGroup"
+          :row-key="(record) => record.id"
+          :loading="isLoading"
+        >
+          <template #hasPermission="{ record }">
+            <a-checkbox
+              v-model="record.hasPermission"
+              @change="updatePermissionInRole(record)"
+            />
+          </template>
+        </a-table>
+      </a-col>
+    </a-row>
   </div>
 </template>
 <script>
 import axios from "axios";
-import { Table, Checkbox } from 'ant-design-vue';
+import { Table, Checkbox } from "ant-design-vue";
 export default {
   name: "Permissions",
-  components: {
-    'a-table': Table,
-    'a-checkbox': Checkbox,
-  },
+
+  components: { "a-table": Table, "a-checkbox": Checkbox },
   computed: {
     hethong_update() {
       return this.$store.getters.hasPermission("hethong_update");
@@ -101,102 +73,30 @@ export default {
       permission_groups: [],
       permission_groups_selected: null,
       columns: [
-        {
-          title: 'Selected',
-          dataIndex: 'selected',
-          scopedSlots: { customRender: 'selected' },
+        /*  {
+          title: "Selected",
+          dataIndex: "selected",
+          scopedSlots: { customRender: "selected" },
+          key: "selected",
           width: 100,
-        },
-        {
-          key: "name",
-          title: "Group",
-          dataIndex: "name",
-        },
-        // add other columns as needed
+        }, */
+        { key: "name", title: "Group", dataIndex: "name" },
       ],
-      permissionGroupColumns: [
-        {
-          title: 'Selected',
-          dataIndex: 'selected',
-          width: 100,
-          scopedSlots: { customRender: 'selected' },
-          
-        },
-        {
-          key: "name",
-          title: "Role",
-          dataIndex:"name",
-        },
-        // add other columns as needed
-      ],
+      permissionGroupColumns: [{ key: "name", title: "Role", dataIndex: "name" }],
       permissionColumns: [
-        {
-          key: "hasPermission",
-          dataIndex: "hasPermission",
-          title: "",
-        },
-        {
-          key: "name",
-          title: "Permission",
-          dataIndex: "name",
-          sortable: true,
-        },
+        { key: "hasPermission", dataIndex: "hasPermission", title: "" },
+        { key: "name", title: "Permission", dataIndex: "name", sortable: true },
       ],
     };
   },
-/*   data() {
-    return {
-      items: [],
-      item_selected: null,
-      permission: [],
-      permissionsByGroup: [],
-      permission_group_selected: null,
-      //Column Table
-      columns: [
-        {
-          key: "selected",
-          label: "",
-        },
-        {
-          key: "name",
-          label: "Group",
-          dataIndex: "name",
-        },
-      ],
-      //table permission group
-      permissionGroupsColumns: [
-        {
-          key: "selected",
-          title: "",
-        },
-        {
-          key: "name",
-          title: "Role",
-        },
-      ],
-      //table permission
-      activityColumns: [
-        {
-          key: "hasPermission",
-          dataIndex: "hasPermission",
-          title: "",
-        },
-        {
-          key: "name",
-          title: "Permission",
-          dataIndex: "name",
-          sortable: true,
-        },
-      ],
-    };
-  }, */
   beforeRouteEnter(to, from, next) {
     axios.all([axios.get("/api/role"), axios.get("/api/permissiongroup")]).then(
       axios.spread((role, permission_groups) => {
-        next((vm) => vm.initData(role.data.items, permission_groups.data.items));
+        next((vm) => vm.initData(role.data, permission_groups.data.items));
       })
     );
   },
+
   methods: {
     initData(items, permission_groups) {
       this.items = items;
@@ -223,7 +123,7 @@ export default {
         return;
       }
       axios
-        .get(`/api/role/${this.item_selected[0].id}/permissiongroup`)
+        .get(`/api/role/${this.item_selected.id}/permissiongroup`)
         .then((res) => {
           this.permission = res.data.items;
         })
@@ -249,4 +149,3 @@ export default {
   },
 };
 </script>
-<style scoped></style>

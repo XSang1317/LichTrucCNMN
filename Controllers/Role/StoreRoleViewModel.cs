@@ -2,7 +2,7 @@
 {
     public class StoreRoleViewModel
     {
-        public string? name { get; set; }
+        public string name { get; set; }
         public int CreatedBy { get; set; }
     }
 }
